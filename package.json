@@ -1,0 +1,23 @@
+{
+  "name": "wandering-lens",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  },
+  "dependencies": {
+    "howler": "^2.2.4",
+    "nipplejs": "^0.10.2",
+    "three": "^0.165.0",
+    "three-mesh-bvh": "^0.7.6"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.1.1",
+    "vite": "^5.3.1"
+  }
+}
