@@ -5,11 +5,17 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   base: '/wandering-lens/',
   build: {
+    // three.js core is one monolithic vendor chunk (~510 kB min, ~129 kB
+    // gzip) and cannot be split further — raise the limit just past it.
+    chunkSizeWarningLimit: 560,
     rollupOptions: {
       output: {
-        manualChunks: {
-          three: ['three'],
-          howler: ['howler'],
+        manualChunks(id) {
+          if (id.includes('three/examples')) return 'three-addons';
+          if (id.includes('node_modules/three')) return 'three';
+          if (id.includes('node_modules/howler')) return 'howler';
+          if (id.includes('node_modules/nipplejs')) return 'nipplejs';
+          return undefined;
         },
       },
     },

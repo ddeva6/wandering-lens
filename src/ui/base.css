@@ -14,3 +14,23 @@ body {
   height: 100%;
   touch-action: none;
 }
+
+.joystick-zone {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 40%;
+  height: 45%;
+  z-index: 10;
+  touch-action: none;
+}
+
+.swipe-zone {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 55%;
+  height: 100%;
+  z-index: 9;
+  touch-action: none;
+}
