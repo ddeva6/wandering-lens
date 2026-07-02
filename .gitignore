@@ -1,6 +1,23 @@
+# Dependencies
 node_modules/
+
+# Build output — GitHub Actions builds this, never commit manually
 dist/
+
+# Environment and secrets — never commit
 .env
+.env.local
 .env.*
-*.local
+
+# Story content — kept in private repo, never commit to public repo
+public/data/story.json
+public/audio/victor/
+src/story/journalEntries.full.js
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+.idea/

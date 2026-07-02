@@ -1,3 +1,11 @@
+/**
+ * The Wandering Lens — Virtual Wild Safari
+ * Copyright (c) 2026 Devakumar M
+ * Story, characters and narrative: All Rights Reserved
+ * Code: CC BY-NC-ND 4.0
+ * https://github.com/ddeva6/wandering-lens
+ */
+
 import { createRenderer, resizeRenderer } from './core/renderer.js';
 import { createScene } from './core/scene.js';
 import { createCamera, resizeCamera } from './core/camera.js';
