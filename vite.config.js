@@ -4,4 +4,14 @@ import { defineConfig } from 'vite';
 // https://<username>.github.io/wandering-lens/
 export default defineConfig({
   base: '/wandering-lens/',
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          three: ['three'],
+          howler: ['howler'],
+        },
+      },
+    },
+  },
 });
