@@ -7,10 +7,12 @@
  */
 
 import { Clock } from 'three';
+import { AnimalManager } from '../animals/AnimalManager.js';
 
-export function createLoop(renderer, scene, camera) {
+export function createLoop(renderer, scene, camera, terrain) {
   const clock = new Clock();
   const updatables = [];
+  const animalManager = new AnimalManager(scene, terrain);
   let running = false;
 
   function tick() {
@@ -21,12 +23,14 @@ export function createLoop(renderer, scene, camera) {
     for (const update of updatables) {
       update(delta, elapsed);
     }
+    animalManager.update(delta);
 
     renderer.render(scene, camera);
     requestAnimationFrame(tick);
   }
 
   return {
+    animalManager,
     // update: (delta, elapsed) => void
     add(update) {
       updatables.push(update);

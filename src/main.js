@@ -28,6 +28,8 @@ import {
 } from './jeep/onFootMode.js';
 import { createDashboard } from './jeep/dashboard.js';
 import { createResources } from './mechanics/resources.js';
+import { setGameHour } from './world/dayNight.js';
+import { eventBus } from './utils/eventBus.js';
 
 const CHASE_DISTANCE = 12;
 const CHASE_HEIGHT = 5;
@@ -59,7 +61,6 @@ function start() {
   const renderer = createRenderer(canvas);
   const scene = createScene();
   const camera = createCamera();
-  const loop = createLoop(renderer, scene, camera);
 
   createSkybox(scene);
   const terrain = createTerrain(scene);
@@ -67,6 +68,7 @@ function start() {
   const dayNight = createDayNightCycle(scene);
   createSoundManager();
 
+  const loop = createLoop(renderer, scene, camera, terrain);
   const resources = createResources();
   const jeep = createJeep(scene);
   const controls = createControls(canvas);
@@ -76,12 +78,14 @@ function start() {
   loop.add((delta) => {
     weather.update(delta);
     dayNight.update(delta, weather.getModifiers());
+    setGameHour(dayNight.getHour());
 
     let metres = 0;
     if (isOnFoot()) {
       updateWalk(delta, controls.keys, controls.getLook().yaw);
       const player = getPlayerPosition();
       player.y = terrain.getHeightAt(player.x, player.z);
+      eventBus.emit('jeep:positionUpdate', { position: player });
     } else {
       metres = applyDriving(delta, controls.keys, jeep.group);
       const ground = terrain.getHeightAt(jeep.group.position.x, jeep.group.position.z);
@@ -101,8 +105,15 @@ function start() {
   loop.start();
 
   if (import.meta.env.DEV) {
-    window.__WL = { jeep: jeep.group, getEngineState, getSpeed, resources, isOnFoot };
-    console.log('[WL] Phase 3 running — jeep, controls, engine cut, dashboard, resources');
+    window.__WL = {
+      jeep: jeep.group,
+      getEngineState,
+      getSpeed,
+      resources,
+      isOnFoot,
+      animalManager: loop.animalManager,
+    };
+    console.log('[WL] Phase 4 running — jeep, controls, animal AI, memory, waterhole');
   }
 }
 

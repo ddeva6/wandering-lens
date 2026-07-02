@@ -1,0 +1,51 @@
+/**
+ * The Wandering Lens — Virtual Wild Safari
+ * Copyright (c) 2026 Devakumar M
+ * Story, characters and narrative: All Rights Reserved
+ * Code: CC BY-NC-ND 4.0
+ * https://github.com/ddeva6/wandering-lens
+ */
+
+const KMH_TO_MS = 1 / 3.6;
+
+export function kmhToMs(kmh) {
+  return kmh * KMH_TO_MS;
+}
+
+export function distance2D(a, b) {
+  const dx = a.x - b.x;
+  const dz = a.z - b.z;
+  return Math.sqrt(dx * dx + dz * dz);
+}
+
+// Moves `mesh` toward `target` at kmh, rotating to face travel direction.
+// Returns true once within arriveThreshold of the target.
+export function moveToward(mesh, target, kmh, delta, arriveThreshold = 0.5) {
+  const dx = target.x - mesh.position.x;
+  const dz = target.z - mesh.position.z;
+  const dist = Math.sqrt(dx * dx + dz * dz);
+  if (dist < arriveThreshold) return true;
+
+  const step = Math.min(dist, kmhToMs(kmh) * delta);
+  mesh.position.x += (dx / dist) * step;
+  mesh.position.z += (dz / dist) * step;
+  mesh.rotation.y = Math.atan2(dx, dz);
+  return false;
+}
+
+// Moves `mesh` directly away from `source` at kmh.
+export function moveAway(mesh, source, kmh, delta) {
+  const dx = mesh.position.x - source.x;
+  const dz = mesh.position.z - source.z;
+  const dist = Math.sqrt(dx * dx + dz * dz) || 1;
+  const step = kmhToMs(kmh) * delta;
+  mesh.position.x += (dx / dist) * step;
+  mesh.position.z += (dz / dist) * step;
+  mesh.rotation.y = Math.atan2(dx, dz);
+}
+
+export function randomInRadius(centerX, centerZ, radius) {
+  const angle = Math.random() * Math.PI * 2;
+  const r = Math.random() * radius;
+  return { x: centerX + Math.cos(angle) * r, z: centerZ + Math.sin(angle) * r };
+}

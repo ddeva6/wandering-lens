@@ -7,6 +7,7 @@
  */
 
 import { getEngineState } from './engineCut.js';
+import { eventBus } from '../utils/eventBus.js';
 
 // Arcade driving — no physics engine. speed is in km/h.
 const ACCELERATION = 15;
@@ -21,6 +22,12 @@ const velocity = { x: 0, z: 0 };
 
 export function getSpeed() {
   return speed;
+}
+
+// World-space velocity in m/s, used by animal AI (e.g. cheetah race trigger)
+// to compare travel direction against the jeep-to-animal vector.
+export function getVelocity() {
+  return velocity;
 }
 
 // Advances the jeep one frame. Returns metres driven this frame so the
@@ -50,6 +57,8 @@ export function applyDriving(delta, keys, jeep) {
   velocity.z = -Math.cos(jeep.rotation.y) * speed * KMH_TO_MS;
   jeep.position.x += velocity.x * delta;
   jeep.position.z += velocity.z * delta;
+
+  eventBus.emit('jeep:positionUpdate', { position: jeep.position });
 
   return Math.abs(metres);
 }
