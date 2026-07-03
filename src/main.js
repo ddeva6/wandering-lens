@@ -13,7 +13,6 @@ import { createLoop } from './core/loop.js';
 import { createTerrain } from './world/terrain.js';
 import { createSkybox } from './world/skybox.js';
 import { createDayNightCycle } from './world/dayNightCycle.js';
-import { setDayNightRef } from './world/dayNightRef.js';
 import { createWeather } from './world/weather.js';
 import { createSoundManager } from './audio/soundManager.js';
 import { createJeep } from './jeep/jeepModel.js';
@@ -56,8 +55,6 @@ import * as buryEnding from './story/endings/buryEnding.js';
 import * as returnEnding from './story/endings/returnEnding.js';
 import * as victorsChallenge from './story/victorsChallenge.js';
 import * as journalUI from './ui/journalUI.js';
-import * as worldEndingVisuals from './story/endings/worldEndingVisuals.js';
-import * as endingWorldEffects from './story/endings/endingWorldEffects.js';
 
 const CHASE_DISTANCE = 12;
 const CHASE_HEIGHT = 5;
@@ -113,7 +110,6 @@ function start() {
 
   initSaveKeys();
   setJeepRef(jeep.group);
-  setDayNightRef(dayNight);
 
   initShotSystem(resourceManager);
   viewfinderUI.init();
@@ -132,7 +128,6 @@ function start() {
   amara.init(scene, jeep.group);
   isaac.init(scene);
   gpsTrackerReveal.init();
-
   endingTrigger.init();
   endingChoiceUI.init();
   publishEnding.init();
@@ -140,8 +135,6 @@ function start() {
   returnEnding.init();
   victorsChallenge.init();
   journalUI.init();
-  worldEndingVisuals.init(scene);
-  endingWorldEffects.init();
 
   eventBus.emit('game:start');
 

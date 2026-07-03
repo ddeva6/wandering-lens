@@ -1,0 +1,88 @@
+.ending-typewriter {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  max-width: 65vw;
+  text-align: center;
+  color: #ffffff;
+  font-family: sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+  transition: opacity 1s ease;
+}
+
+.ending-typewriter--fading {
+  opacity: 0;
+}
+
+.ending-typewriter.amara-voice {
+  font-style: italic;
+  color: #f0e0c0;
+}
+
+.ending-fade-line {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 60;
+  color: #ffffff;
+  font-family: sans-serif;
+  font-size: 18px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+
+.ending-fade-line--visible {
+  opacity: 1;
+}
+
+.ending-stills {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  pointer-events: none;
+}
+
+.ending-still {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.ending-still--visible {
+  opacity: 0.5;
+}
+
+.ending-signature {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  text-align: center;
+  font-family: 'Caveat', cursive;
+  color: #ffffff;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+
+.ending-signature--visible {
+  opacity: 1;
+}
+
+.ending-signature-name {
+  font-size: 28px;
+  margin: 0;
+}
+
+.ending-signature-line {
+  font-size: 18px;
+  margin: 4px 0 0;
+  opacity: 0.85;
+}

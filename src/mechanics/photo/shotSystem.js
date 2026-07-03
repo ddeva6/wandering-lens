@@ -9,12 +9,11 @@
 import { save, load } from '../../utils/localStorage.js';
 import { eventBus } from '../../utils/eventBus.js';
 import { getGameHour } from '../../world/dayNight.js';
-import { getTimingScore } from './timingMeter.js';
-import { victorAttempts } from '../../story/victorAttempts.js';
-import { getPlayerPosition } from '../../jeep/onFootMode.js';
 import { getZone } from '../../utils/mathUtils.js';
+import { getTimingScore } from './timingMeter.js';
 import { getDistanceScore } from './distanceMeter.js';
 import { getMomentScore, getActiveMoment } from './momentDetector.js';
+import { challengeEntries } from '../../story/victorsChallenge.js';
 
 const TIMING_WEIGHT = 0.35;
 const DISTANCE_WEIGHT = 0.4;
@@ -28,9 +27,31 @@ const LEGENDARY_COST = 3;
 // own independent localStorage round trip, avoids resourceManager's
 // periodic autosave clobbering a shot's film deduction.
 let resourcesController = null;
+let playerPosition = { x: 0, z: 0 };
 
 export function init(controller) {
   resourcesController = controller;
+  eventBus.on('jeep:positionUpdate', ({ position }) => {
+    playerPosition = position;
+  });
+}
+
+// shot.species is only ever set when an active photo:momentActive fired for
+// that species (see the species classes under src/animals/species/), so a
+// species+zone match here already implies the requiredMoment happened —
+// no separate moment-type comparison is needed.
+function checkChallengeMatch(shot) {
+  if (!shot.species || !load('victors_challenge_active', false)) return;
+
+  const zone = getZone(playerPosition.x, playerPosition.z);
+  const progress = load('victors_challenge_progress', {});
+  const match = challengeEntries.find(
+    (entry) => entry.species === shot.species && entry.zone === zone && !progress[entry.id]
+  );
+
+  if (match && Math.random() < match.rarity) {
+    eventBus.emit('challenge:shotMatched', { entry: match, shot });
+  }
 }
 
 export function calculateScore() {
@@ -90,33 +111,10 @@ export function takeShot(isLegendary = false) {
   save('photo_album', album);
 
   eventBus.emit('photo:taken', shot);
-  if (isLegendary) {
-    eventBus.emit('photo:legendary', shot);
-
-    // Check against Victor's challenge. shot.species is only ever set when
-    // an active photo:momentActive fired for that species (see the species
-    // classes under src/animals/species/), so a species+zone match already
-    // implies the requiredMoment happened — there's no separate moment-type
-    // field on activeMoment to compare against.
-    if (load('victors_challenge_active', false)) {
-      const pos = getPlayerPosition();
-      const zone = getZone(pos.x, pos.z);
-      const progress = load('victors_challenge_progress', {});
-
-      const match = victorAttempts.find(entry =>
-        entry.species === shot.species &&
-        entry.zone === zone &&
-        !progress[entry.id] &&
-        Math.random() < (entry.rarity || 0.15)
-      );
-
-      if (match) {
-        eventBus.emit('challenge:shotMatched', { entry: match, shot });
-      }
-    }
-  }
+  if (isLegendary) eventBus.emit('photo:legendary', shot);
 
   eventBus.emit('journal:unlock', { tier: unlockTier(score), species: shot.species, score });
+  checkChallengeMatch(shot);
 
   return shot;
 }
