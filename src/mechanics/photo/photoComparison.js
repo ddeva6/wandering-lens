@@ -8,19 +8,13 @@
 
 import { eventBus } from '../../utils/eventBus.js';
 import { victorAttempts } from '../../story/victorAttempts.js';
+import { getZone } from '../../utils/mathUtils.js';
 
 const AUTO_DISMISS_MS = 5000;
 
 let playerPosition = { x: 0, z: 0 };
 let dismissTimer = null;
 let overlay = null;
-
-// Same west/east/north/south quadrant split used to place every species'
-// spawn zone — see AnimalManager species spawn constants.
-function getZone(x, z) {
-  if (Math.abs(x) >= Math.abs(z)) return x >= 0 ? 'east' : 'west';
-  return z >= 0 ? 'south' : 'north';
-}
 
 function findMatch(species) {
   const zone = getZone(playerPosition.x, playerPosition.z);

@@ -45,11 +45,22 @@ let cinematicUntil = 0;
 
 eventBus.on('world:plateauView', () => {
   cinematicUntil = Date.now() + CINEMATIC_DURATION_MS;
+  cinematicShot = { position: CINEMATIC_POSITION, lookAt: CINEMATIC_LOOKAT };
 });
+
+// Generic version of the same hijack, used by ending cutscenes to hold on
+// an arbitrary point (e.g. the returnEnding's "camera stays on the group
+// as the jeep drives away") instead of the hardcoded plateau shot.
+let cinematicShot = { position: CINEMATIC_POSITION, lookAt: CINEMATIC_LOOKAT };
+
+export function holdCameraOn(position, lookAt, durationMs) {
+  cinematicUntil = Date.now() + durationMs;
+  cinematicShot = { position, lookAt };
+}
 
 export function getCinematicOverride() {
   if (Date.now() >= cinematicUntil) return null;
-  return { position: CINEMATIC_POSITION, lookAt: CINEMATIC_LOOKAT };
+  return cinematicShot;
 }
 
 export function createCamera() {

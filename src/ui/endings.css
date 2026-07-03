@@ -1,0 +1,137 @@
+.ending-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  background: rgba(0, 0, 0, 0.88);
+  font-family: sans-serif;
+  color: #ffffff;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.ending-quote {
+  font-family: serif;
+  font-size: 16px;
+  font-style: italic;
+  text-align: center;
+  max-width: 500px;
+  margin: 0 auto;
+  opacity: 1;
+  transition: opacity 1s ease;
+}
+
+.ending-quote--fading {
+  opacity: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.ending-quote-attribution {
+  display: block;
+  margin-top: 10px;
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.ending-cards {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  max-width: 1000px;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.ending-cards--visible {
+  opacity: 1;
+}
+
+@media (max-width: 600px) {
+  .ending-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.ending-card {
+  width: 30%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 0.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 24px 20px;
+  box-sizing: border-box;
+  transition: border-color 0.3s, background 0.3s, opacity 0.3s;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .ending-card {
+    width: 90%;
+  }
+}
+
+.ending-card:hover,
+.ending-card:focus-within {
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.ending-card--selected {
+  border-color: #ffffff;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.ending-card--faded {
+  opacity: 0.2;
+}
+
+.ending-card-icon {
+  margin-bottom: 12px;
+}
+
+.ending-card-title {
+  font-size: 16px;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  margin: 0 0 10px;
+}
+
+.ending-card-subtitle {
+  font-size: 13px;
+  margin: 0 0 12px;
+  opacity: 0.9;
+}
+
+.ending-card-consequence {
+  font-size: 12px;
+  opacity: 0.7;
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+
+.ending-card-button {
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.ending-no-wrong-answer {
+  font-size: 12px;
+  color: #999999;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.ending-no-wrong-answer--visible {
+  opacity: 1;
+}

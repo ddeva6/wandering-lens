@@ -1,0 +1,124 @@
+.challenge-unlock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 410;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: rgba(0, 0, 0, 0.9);
+  color: #ffffff;
+  font-family: sans-serif;
+  text-align: center;
+  padding: 24px;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.challenge-unlock-overlay--visible {
+  opacity: 1;
+}
+
+.challenge-unlock-title {
+  font-size: 26px;
+  letter-spacing: 0.08em;
+  margin: 0;
+}
+
+.challenge-unlock-subtitle {
+  font-size: 14px;
+  max-width: 460px;
+  opacity: 0.85;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.challenge-unlock-button {
+  margin-top: 12px;
+  padding: 10px 24px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.challenge-found-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 410;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #ffffff;
+  font-family: sans-serif;
+  text-align: center;
+  padding: 24px;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.challenge-found-overlay--visible {
+  opacity: 1;
+}
+
+.challenge-found-title {
+  font-size: 15px;
+  letter-spacing: 0.15em;
+  color: #ffd700;
+  margin: 0;
+}
+
+.challenge-found-panels {
+  display: flex;
+  gap: 24px;
+  max-width: 700px;
+}
+
+.challenge-found-panel {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.challenge-found-panel--asha {
+  border-color: #ffd700;
+}
+
+.challenge-found-label {
+  font-size: 11px;
+  opacity: 0.7;
+  margin: 0 0 8px;
+}
+
+.challenge-found-score {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0 0 8px;
+}
+
+.challenge-found-note {
+  font-size: 12px;
+  line-height: 1.5;
+  opacity: 0.8;
+  margin: 0;
+}
+
+.challenge-found-count {
+  font-size: 12px;
+  opacity: 0.6;
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .challenge-found-panels {
+    flex-direction: column;
+  }
+}
