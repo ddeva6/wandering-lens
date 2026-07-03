@@ -17,6 +17,7 @@ let canvas = null;
 let ctx = null;
 let active = false;
 let hasOpenedBefore = false;
+let shutterBtn = null;
 
 function resizeCanvas() {
   if (!canvas) return;
@@ -28,10 +29,30 @@ export function mount() {
   if (active) return;
   canvas = document.createElement('canvas');
   canvas.className = 'viewfinder-canvas';
+  canvas.setAttribute('role', 'img');
+  canvas.setAttribute('aria-label', 'Wildlife viewfinder');
   ctx = canvas.getContext('2d');
   document.body.appendChild(canvas);
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
+
+  // Accessible shutter button overlay
+  shutterBtn = document.createElement('button');
+  shutterBtn.className = 'viewfinder-shutter-btn';
+  shutterBtn.setAttribute('aria-label', 'Take photograph');
+  shutterBtn.style.position = 'fixed';
+  shutterBtn.style.top = '0';
+  shutterBtn.style.left = '0';
+  shutterBtn.style.width = '100vw';
+  shutterBtn.style.height = '100vh';
+  shutterBtn.style.opacity = '0';
+  shutterBtn.style.zIndex = '9999';
+  shutterBtn.style.cursor = 'pointer';
+  shutterBtn.style.border = 'none';
+  shutterBtn.style.padding = '0';
+  shutterBtn.style.background = 'transparent';
+  document.body.appendChild(shutterBtn);
+
   active = true;
 
   if (!hasOpenedBefore) {
@@ -43,8 +64,14 @@ export function mount() {
 export function unmount() {
   if (!active) return;
   window.removeEventListener('resize', resizeCanvas);
-  canvas.remove();
-  canvas = null;
+  if (canvas) {
+    canvas.remove();
+    canvas = null;
+  }
+  if (shutterBtn) {
+    shutterBtn.remove();
+    shutterBtn = null;
+  }
   ctx = null;
   active = false;
 }

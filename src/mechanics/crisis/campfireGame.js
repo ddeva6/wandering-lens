@@ -13,6 +13,8 @@ const SPAWN_MIN_MS = 2000;
 const SPAWN_MAX_MS = 4000;
 const SPAWN_RADIUS = 200;
 
+import { prefersReducedMotion } from '../../core/camera.js';
+
 // The firewood-clicking rhythm game itself — trigger detection, audio and
 // narrative side-effects live in hyenaCamp.js, which calls this.
 export function startCampfireGame(onSurvive, onFail) {
@@ -32,6 +34,13 @@ export function startCampfireGame(onSurvive, onFail) {
     </div>
   `;
   document.body.appendChild(overlay);
+
+  if (prefersReducedMotion) {
+    overlay.querySelectorAll('.campfire-flame').forEach((flame) => {
+      flame.style.animation = 'none';
+      flame.style.webkitAnimation = 'none';
+    });
+  }
 
   let misses = 0;
   let spawnTimer = null;

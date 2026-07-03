@@ -11,11 +11,12 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('three/examples')) return 'three-addons';
-          if (id.includes('node_modules/three')) return 'three';
-          if (id.includes('node_modules/howler')) return 'howler';
-          if (id.includes('node_modules/nipplejs')) return 'nipplejs';
-          return undefined;
+          if (id.includes('node_modules')) {
+            if (id.includes('three')) return 'three';
+            if (id.includes('howler')) return 'howler';
+            if (id.includes('nipplejs')) return 'nipplejs';
+            return 'vendor';
+          }
         },
       },
     },

@@ -8,7 +8,7 @@
 
 import { createRenderer, resizeRenderer } from './core/renderer.js';
 import { createScene } from './core/scene.js';
-import { createCamera, resizeCamera, applyCameraEffects, getCinematicOverride } from './core/camera.js';
+import { createCamera, resizeCamera, applyCameraEffects, getCinematicOverride, prefersReducedMotion } from './core/camera.js';
 import { createLoop } from './core/loop.js';
 import { createTerrain } from './world/terrain.js';
 import { createSkybox } from './world/skybox.js';
@@ -55,6 +55,9 @@ import * as buryEnding from './story/endings/buryEnding.js';
 import * as returnEnding from './story/endings/returnEnding.js';
 import * as victorsChallenge from './story/victorsChallenge.js';
 import * as journalUI from './ui/journalUI.js';
+import * as worldEndingVisuals from './story/endings/worldEndingVisuals.js';
+import * as endingWorldEffects from './story/endings/endingWorldEffects.js';
+import { init as initLoadingScreen } from './ui/loadingScreen.js';
 
 const CHASE_DISTANCE = 12;
 const CHASE_HEIGHT = 5;
@@ -90,6 +93,10 @@ function updateChaseCamera(camera, jeep, look) {
 }
 
 function start() {
+  initLoadingScreen();
+  if (prefersReducedMotion) {
+    document.body.classList.add('prefers-reduced-motion');
+  }
   const canvas = document.getElementById('game-canvas');
   const renderer = createRenderer(canvas);
   const scene = createScene();
@@ -179,7 +186,7 @@ function start() {
       isaac,
     };
     window.eventBus = eventBus;
-    console.log('[WL] Phase 9 running — three endings, Victor\'s Challenge, journal UI');
+    console.log('[WL] Phase 10 running — Polish and Production Deploy');
   }
 }
 

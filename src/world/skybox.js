@@ -12,6 +12,7 @@ import {
   SRGBColorSpace,
   Color,
 } from 'three';
+import { loadingManager } from '../core/loadingManager.js';
 
 // Loads an equirectangular skybox from public/textures/skybox.jpg.
 // While the file is missing, scene.background stays a Color and the
@@ -20,7 +21,7 @@ export function createSkybox(scene) {
   let texture = null;
   const url = `${import.meta.env.BASE_URL}textures/skybox.jpg`;
 
-  new TextureLoader().load(
+  new TextureLoader(loadingManager).load(
     url,
     (loaded) => {
       loaded.mapping = EquirectangularReflectionMapping;

@@ -64,20 +64,44 @@ function resolveRun(overlay, lion) {
 function buildOverlay(lion) {
   const overlay = document.createElement('div');
   overlay.className = 'crisis-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
   overlay.innerHTML = `
     <div class="crisis-lion-band">LION CHARGING</div>
     <div class="crisis-choice-cards">
-      <button type="button" class="crisis-choice-card" data-choice="still">STAY STILL</button>
-      <button type="button" class="crisis-choice-card" data-choice="run">RUN</button>
-      <button type="button" class="crisis-choice-card" data-choice="noise">MAKE NOISE</button>
+      <button type="button" class="crisis-choice-card" data-choice="still" aria-label="Stay still and hold position">STAY STILL</button>
+      <button type="button" class="crisis-choice-card" data-choice="run" aria-label="Run back to the jeep">RUN</button>
+      <button type="button" class="crisis-choice-card" data-choice="noise" aria-label="Make noise to scare the lion">MAKE NOISE</button>
     </div>
-    <svg class="crisis-countdown" viewBox="0 0 40 40">
+    <svg class="crisis-countdown" viewBox="0 0 40 40" aria-live="polite" aria-label="3 seconds remaining">
       <circle class="crisis-countdown-track" cx="20" cy="20" r="17" />
       <circle class="crisis-countdown-arc" cx="20" cy="20" r="17" />
     </svg>
   `;
   overlay.addEventListener('click', (event) => event.stopPropagation());
   document.body.appendChild(overlay);
+
+  // Focus trap and keyboard navigation
+  const focusable = overlay.querySelectorAll('.crisis-choice-card');
+  const firstFocusable = focusable[0];
+  const lastFocusable = focusable[focusable.length - 1];
+  if (firstFocusable) firstFocusable.focus();
+
+  overlay.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      if (e.shiftKey) {
+        if (document.activeElement === firstFocusable) {
+          lastFocusable.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (document.activeElement === lastFocusable) {
+          firstFocusable.focus();
+          e.preventDefault();
+        }
+      }
+    }
+  });
 
   let resolved = false;
   const timeout = setTimeout(() => resolveChoice('run'), COUNTDOWN_MS);

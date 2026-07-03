@@ -21,10 +21,12 @@ import { save, load } from '../../utils/localStorage.js';
 import { getAnimalManager } from '../../animals/AnimalManager.js';
 import { getGameHour } from '../../world/dayNight.js';
 import { resourceManager } from '../survival/resourceManager.js';
+import { isMobile } from '../../core/renderer.js';
+import { prefersReducedMotion } from '../../core/camera.js';
 
 const DAILY_CHANCE = 0.15;
 const TRIGGER_HOUR = 13;
-const PARTICLE_COUNT = 800;
+const PARTICLE_COUNT = isMobile ? 400 : 800;
 const SPAWN_X_RANGE = [-100, 100];
 const SPAWN_Z = 200;
 const PARTICLE_LIFETIME_S = 4;
@@ -104,9 +106,34 @@ function burnTerrainPatch(scene) {
   scene.add(patch);
 }
 
+let smokeOverlay = null;
+
+function showStaticSmokeOverlay() {
+  smokeOverlay = document.createElement('div');
+  smokeOverlay.className = 'smoke-overlay';
+  smokeOverlay.style.position = 'fixed';
+  smokeOverlay.style.top = '0';
+  smokeOverlay.style.left = '0';
+  smokeOverlay.style.width = '100vw';
+  smokeOverlay.style.height = '100vh';
+  smokeOverlay.style.backgroundColor = 'rgba(42, 42, 42, 0.75)';
+  smokeOverlay.style.zIndex = '999';
+  smokeOverlay.style.pointerEvents = 'none';
+  document.body.appendChild(smokeOverlay);
+}
+
+function removeStaticSmokeOverlay() {
+  if (smokeOverlay) {
+    smokeOverlay.remove();
+    smokeOverlay = null;
+  }
+}
+
 function showSubtitle() {
   const el = document.createElement('p');
   el.className = 'fire-subtitle';
+  el.setAttribute('aria-live', 'polite');
+  el.setAttribute('role', 'status');
   el.textContent = 'Navigate by compass only. The river breaks the fire.';
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 5500);
@@ -117,7 +144,10 @@ function triggerWildfire() {
   if (!scene) return;
 
   eventBus.emit('crisis:wildfireStart');
-  const particles = createParticles(scene);
+  const particles = prefersReducedMotion ? null : createParticles(scene);
+  if (prefersReducedMotion) {
+    showStaticSmokeOverlay();
+  }
   scene.fog.wildfireOverride = true;
   scene.fog.near = FOG_FIRE_NEAR;
   scene.fog.far = FOG_FIRE_FAR;
@@ -131,7 +161,9 @@ function triggerWildfire() {
   const interval = setInterval(() => {
     const dt = TICK_MS / 1000;
     elapsed += dt;
-    updateParticles(particles, dt);
+    if (particles) {
+      updateParticles(particles, dt);
+    }
 
     if (!resolved && playerPosition.x > RIVER_X) {
       resolved = true;
@@ -146,9 +178,13 @@ function triggerWildfire() {
 }
 
 function stopParticles(scene, particles) {
-  scene.remove(particles.points);
-  particles.geometry.dispose();
-  particles.material.dispose();
+  if (prefersReducedMotion) {
+    removeStaticSmokeOverlay();
+  } else if (particles) {
+    scene.remove(particles.points);
+    particles.geometry.dispose();
+    particles.material.dispose();
+  }
 }
 
 function restoreFog(scene) {

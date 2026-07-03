@@ -40,11 +40,15 @@ eventBus.on('jeep:positionUpdate', ({ position }) => {
 // interact listeners.
 let victorCampSpawned = false;
 let fossilTreeSpawned = false;
+let campGroup = null;
+let treeGroup = null;
+let cubMesh = null;
 
 function spawnVictorCamp(scene) {
   if (victorCampSpawned) return;
   victorCampSpawned = true;
   const group = new Group();
+  campGroup = group;
   group.position.set(VICTOR_CAMP_POSITION.x, 0, VICTOR_CAMP_POSITION.z);
 
   const box = new Mesh(
@@ -82,6 +86,7 @@ function spawnFossilTree(scene) {
   if (fossilTreeSpawned) return;
   fossilTreeSpawned = true;
   const group = new Group();
+  treeGroup = group;
   group.position.set(FOSSIL_TREE_POSITION.x, FOSSIL_TREE_POSITION.y, FOSSIL_TREE_POSITION.z);
 
   const material = new MeshStandardMaterial({ color: 0x3a3a3a, roughness: 1 });
@@ -110,6 +115,7 @@ function spawnOrphanCub(scene, lionPridePosition) {
     new BoxGeometry(0.8, 0.6, 1.2),
     new MeshStandardMaterial({ color: 0xd9a441, roughness: 0.8 })
   );
+  cubMesh = cub;
   const start = isOnFoot() ? getPlayerPosition() : playerPosition;
   cub.position.set(start.x + 1.5, 0, start.z);
   scene.add(cub);
@@ -119,7 +125,7 @@ function spawnOrphanCub(scene, lionPridePosition) {
     elapsed += 0.5;
     const player = isOnFoot() ? getPlayerPosition() : playerPosition;
     if (elapsed < CUB_DURATION_S) {
-      if (distance2D(cub.position, player) > CUB_LEASH_DISTANCE) {
+      if (cubMesh && distance2D(cub.position, player) > CUB_LEASH_DISTANCE) {
         moveToward(cub, player, CUB_FOLLOW_KMH, 0.5, CUB_LEASH_DISTANCE * 0.5);
       }
     } else {
@@ -129,6 +135,7 @@ function spawnOrphanCub(scene, lionPridePosition) {
         scene.remove(cub);
         cub.geometry.dispose();
         cub.material.dispose();
+        cubMesh = null;
         eventBus.emit('event:cubLeft');
       }
     }
@@ -176,4 +183,16 @@ export function init() {
       eventBus.emit('world:plateauView');
     }
   });
+}
+
+export function updateComebackObjects(frustum) {
+  if (campGroup) {
+    campGroup.visible = frustum.containsPoint(campGroup.position);
+  }
+  if (treeGroup) {
+    treeGroup.visible = frustum.containsPoint(treeGroup.position);
+  }
+  if (cubMesh) {
+    cubMesh.visible = frustum.containsPoint(cubMesh.position);
+  }
 }

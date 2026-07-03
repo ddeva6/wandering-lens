@@ -8,7 +8,14 @@
 
 import { Group, BoxGeometry, CylinderGeometry, MeshStandardMaterial, Mesh } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { loadingManager } from '../../core/loadingManager.js';
 import { showDialogueSequence } from '../dialogueSubtitle.js';
+
+const gltfLoader = new GLTFLoader(loadingManager);
+const dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+gltfLoader.setDRACOLoader(dracoLoader);
 
 const DRIVE_SPEED_MPS = 8;
 const STEP_OUT_DURATION_S = 1.5;
@@ -33,17 +40,32 @@ export function buildIsaacGroup(scene) {
   group.visible = false;
   scene.add(group);
 
-  new GLTFLoader().load(
-    `${import.meta.env.BASE_URL}models/isaacJeep.glb`,
-    (gltf) => {
-      group.remove(placeholder);
-      placeholder.geometry.dispose();
-      placeholder.material.dispose();
-      group.add(gltf.scene);
-    },
-    undefined,
-    () => console.warn('[ASSET MISSING] isaacJeep.glb — using placeholder')
-  );
+    const dracoPath = `${import.meta.env.BASE_URL}models/isaacJeep.draco.glb`;
+    const regularPath = `${import.meta.env.BASE_URL}models/isaacJeep.glb`;
+
+    gltfLoader.load(
+      dracoPath,
+      (gltf) => {
+        group.remove(placeholder);
+        placeholder.geometry.dispose();
+        placeholder.material.dispose();
+        group.add(gltf.scene);
+      },
+      undefined,
+      () => {
+        gltfLoader.load(
+          regularPath,
+          (gltf) => {
+            group.remove(placeholder);
+            placeholder.geometry.dispose();
+            placeholder.material.dispose();
+            group.add(gltf.scene);
+          },
+          undefined,
+          () => console.warn('[ASSET MISSING] isaacJeep.glb — using placeholder')
+        );
+      }
+    );
 
   return { group, person };
 }

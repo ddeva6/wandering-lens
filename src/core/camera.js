@@ -6,8 +6,10 @@
  * https://github.com/ddeva6/wandering-lens
  */
 
-import { PerspectiveCamera } from 'three';
+import { PerspectiveCamera, Frustum, Matrix4 } from 'three';
 import { eventBus } from '../utils/eventBus.js';
+
+export const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const FOV = 60;
 const NEAR = 0.1;
@@ -63,8 +65,10 @@ export function getCinematicOverride() {
   return cinematicShot;
 }
 
+export let camera = null;
+
 export function createCamera() {
-  const camera = new PerspectiveCamera(
+  camera = new PerspectiveCamera(
     FOV,
     window.innerWidth / window.innerHeight,
     NEAR,
@@ -83,6 +87,7 @@ export function resizeCamera(camera) {
 // Call this after the caller has already set camera.position/lookAt for
 // the frame — these are perturbations on top of that base position.
 export function applyCameraEffects(camera) {
+  if (prefersReducedMotion) return;
   const now = Date.now();
 
   if (now < swayExpiresAt) {
@@ -96,4 +101,16 @@ export function applyCameraEffects(camera) {
     camera.position.x += (Math.random() - 0.5) * 2 * shakeIntensity * decay;
     camera.position.y += (Math.random() - 0.5) * 2 * shakeIntensity * decay;
   }
+}
+
+export const frustum = new Frustum();
+const frustumMatrix = new Matrix4();
+
+export function updateFrustum(cameraInstance) {
+  if (!cameraInstance) return;
+  frustumMatrix.multiplyMatrices(
+    cameraInstance.projectionMatrix,
+    cameraInstance.matrixWorldInverse
+  );
+  frustum.setFromProjectionMatrix(frustumMatrix);
 }

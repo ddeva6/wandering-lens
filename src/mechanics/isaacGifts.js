@@ -184,3 +184,11 @@ export function init() {
     else prompt?.classList.remove('isaac-gift-prompt--visible');
   });
 }
+
+export function updateCrates(frustum) {
+  for (const entry of spawned.values()) {
+    if (!entry.collected && entry.mesh) {
+      entry.mesh.visible = frustum.containsPoint(entry.mesh.position);
+    }
+  }
+}

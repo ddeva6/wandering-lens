@@ -11,6 +11,7 @@ import { load } from '../../utils/localStorage.js';
 import { resourceManager } from '../../mechanics/survival/resourceManager.js';
 import { spawnDropById } from '../../mechanics/isaacGifts.js';
 import { isaacDialogue } from './dialogue.js';
+import { frustum } from '../../core/camera.js';
 import { buildIsaacGroup, driveToward, stepOut, playDialogue } from './isaacBehavior.js';
 
 const APPEARANCE1_DELAY_MS = 30000;
@@ -109,6 +110,7 @@ class IsaacCharacter {
 
   update(delta) {
     if (!this.group || this.state === 'idle') return;
+    this.group.visible = frustum.containsPoint(this.group.position);
     const config = this.appearanceConfig;
 
     if (this.state === 'driving_in') {

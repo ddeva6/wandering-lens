@@ -8,6 +8,13 @@
 
 import { Group, BoxGeometry, MeshStandardMaterial, Mesh } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { loadingManager } from '../core/loadingManager.js';
+
+const gltfLoader = new GLTFLoader(loadingManager);
+const dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+gltfLoader.setDRACOLoader(dracoLoader);
 
 export function createJeep(scene) {
   const group = new Group();
@@ -23,8 +30,11 @@ export function createJeep(scene) {
   const placeholder = new Mesh(placeholderGeometry, placeholderMaterial);
   group.add(placeholder);
 
-  new GLTFLoader().load(
-    `${import.meta.env.BASE_URL}models/jeep.glb`,
+  const dracoPath = `${import.meta.env.BASE_URL}models/jeep.draco.glb`;
+  const regularPath = `${import.meta.env.BASE_URL}models/jeep.glb`;
+
+  gltfLoader.load(
+    dracoPath,
     (gltf) => {
       group.remove(placeholder);
       placeholderGeometry.dispose();
@@ -33,7 +43,19 @@ export function createJeep(scene) {
     },
     undefined,
     () => {
-      console.warn('[ASSET MISSING] jeep.glb — using placeholder');
+      gltfLoader.load(
+        regularPath,
+        (gltf) => {
+          group.remove(placeholder);
+          placeholderGeometry.dispose();
+          placeholderMaterial.dispose();
+          group.add(gltf.scene);
+        },
+        undefined,
+        () => {
+          console.warn('[ASSET MISSING] jeep.glb — using placeholder');
+        }
+      );
     }
   );
 

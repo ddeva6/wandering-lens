@@ -8,6 +8,7 @@
 
 import { Fog } from 'three';
 import { eventBus } from '../utils/eventBus.js';
+import { isMobile } from '../core/renderer.js';
 
 // Weather stub: three states that tint the sky, dim the sun and pull the
 // fog in. Visual effects (rain, lightning) come in a later phase.
@@ -48,6 +49,13 @@ export function createWeather(scene) {
 
   scene.fog = new Fog(0x87ceeb, 50, SETTINGS[state].fogFar);
 
+  let playerPosition = { x: 0, z: 0 };
+  let lastFogPos = { x: -Infinity, z: -Infinity };
+
+  eventBus.on('jeep:positionUpdate', ({ position }) => {
+    playerPosition = position;
+  });
+
   function update(delta) {
     timer -= delta;
     if (timer <= 0) {
@@ -69,7 +77,18 @@ export function createWeather(scene) {
     // the "visibility cut to ~15m" effect — skip our own easing until they
     // hand control back, or every render frame would fight their override.
     if (!scene.fog.wildfireOverride) {
-      scene.fog.far += (target.fogFar - scene.fog.far) * k;
+      let shouldUpdateFog = true;
+      if (isMobile) {
+        const dist = Math.hypot(playerPosition.x - lastFogPos.x, playerPosition.z - lastFogPos.z);
+        if (dist <= 5) {
+          shouldUpdateFog = false;
+        } else {
+          lastFogPos = { x: playerPosition.x, z: playerPosition.z };
+        }
+      }
+      if (shouldUpdateFog) {
+        scene.fog.far += (target.fogFar - scene.fog.far) * k;
+      }
     }
   }
 

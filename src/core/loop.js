@@ -15,11 +15,14 @@ import { getDistanceDrivenThisFrame } from '../jeep/jeepPhysics.js';
 import { getTimeScale } from '../story/voiceSystem.js';
 import { amara } from '../characters/amara/AmaraCharacter.js';
 import { isaac } from '../characters/isaac/IsaacCharacter.js';
+import { updateFrustum, frustum, prefersReducedMotion } from './camera.js';
+import { updateCrates } from '../mechanics/isaacGifts.js';
+import { updateComebackObjects } from '../mechanics/comeback/comebackManager.js';
 
 export function createLoop(renderer, scene, camera, terrain) {
   const clock = new Clock();
   const updatables = [];
-  const animalManager = new AnimalManager(scene, terrain);
+  const animalManager = new AnimalManager(scene, terrain, camera);
   let running = false;
 
   function tick() {
@@ -27,6 +30,10 @@ export function createLoop(renderer, scene, camera, terrain) {
     const realDelta = clock.getDelta();
     const delta = realDelta * getTimeScale();
     const elapsed = clock.getElapsedTime();
+
+    updateFrustum(camera);
+    updateCrates(frustum);
+    updateComebackObjects(frustum);
 
     for (const update of updatables) {
       update(delta, elapsed);

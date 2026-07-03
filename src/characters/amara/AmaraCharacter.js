@@ -8,13 +8,21 @@
 
 import { Group, CylinderGeometry, SphereGeometry, MeshStandardMaterial, Mesh } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { loadingManager } from '../../core/loadingManager.js';
 import { eventBus } from '../../utils/eventBus.js';
 import { save, load } from '../../utils/localStorage.js';
 import { distance2D } from '../../utils/mathUtils.js';
 import { amaraDialogue } from './dialogue.js';
+import { frustum } from '../../core/camera.js';
 import { showDialogueLine } from '../dialogueSubtitle.js';
 import * as behavior from './amaraBehavior.js';
 import { initFieldTests, startTest1, startTest2, startTest3, getTestState } from './fieldTests.js';
+
+const gltfLoader = new GLTFLoader(loadingManager);
+const dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+gltfLoader.setDRACOLoader(dracoLoader);
 
 const SPAWN_POSITION = { x: 580, z: 20 };
 const PATROL_RADIUS_T1 = 100; // "200m east-west line" == ±100m
@@ -67,14 +75,27 @@ export class AmaraCharacter {
     this.mesh.add(placeholder);
     scene.add(this.mesh);
 
-    new GLTFLoader().load(
-      `${import.meta.env.BASE_URL}models/amara.glb`,
+    const dracoPath = `${import.meta.env.BASE_URL}models/amara.draco.glb`;
+    const regularPath = `${import.meta.env.BASE_URL}models/amara.glb`;
+
+    gltfLoader.load(
+      dracoPath,
       (gltf) => {
         this.mesh.remove(placeholder);
         this.mesh.add(gltf.scene);
       },
       undefined,
-      () => console.warn('[ASSET MISSING] amara.glb — using placeholder')
+      () => {
+        gltfLoader.load(
+          regularPath,
+          (gltf) => {
+            this.mesh.remove(placeholder);
+            this.mesh.add(gltf.scene);
+          },
+          undefined,
+          () => console.warn('[ASSET MISSING] amara.glb — using placeholder')
+        );
+      }
     );
 
     eventBus.on('jeep:positionUpdate', ({ position }) => {
@@ -122,6 +143,7 @@ export class AmaraCharacter {
 
   update(delta) {
     if (!this.mesh) return;
+    this.mesh.visible = frustum.containsPoint(this.mesh.position);
     if (this.jeep) {
       this.jeepPosition = this.jeep.position;
       this.jeepYaw = this.jeep.rotation.y;

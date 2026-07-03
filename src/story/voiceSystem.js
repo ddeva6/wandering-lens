@@ -29,6 +29,8 @@ const FINAL_RESTORE_S = 8;
 function showSubtitle(text, durationMs) {
   const el = document.createElement('p');
   el.className = 'victor-subtitle';
+  el.setAttribute('aria-live', 'polite');
+  el.setAttribute('role', 'status');
   el.textContent = text;
   el.style.transitionDuration = `${FADE_IN_S}s`;
   document.body.appendChild(el);
@@ -106,7 +108,8 @@ let hasSeenDawn = false;
 
 export function init() {
   Object.values(copy.victorRecordings).forEach((recording) => {
-    eventBus.on(recording.trigger, () => playRecording(recording));
+    const trigger = recording.trigger === 'game:start' ? 'game:loaded' : recording.trigger;
+    eventBus.on(trigger, () => playRecording(recording));
   });
 
   eventBus.on('jeep:positionUpdate', ({ position }) => {

@@ -7,6 +7,8 @@
  */
 
 import { eventBus } from '../../utils/eventBus.js';
+import { prefersReducedMotion } from '../../core/camera.js';
+import { load } from '../../utils/localStorage.js';
 
 const CRITICAL_WATER = 20;
 const SWAY_INTERVAL_MS = 500;
@@ -29,9 +31,10 @@ function removeVignette() {
 }
 
 function startSway() {
+  if (prefersReducedMotion) return;
   if (swayTimer) return;
   swayTimer = setInterval(() => {
-    const resources = JSON.parse(window.localStorage.getItem('wl_resources') || '{}');
+    const resources = load('resources', {});
     const water = resources.water ?? 100;
     if (water >= CRITICAL_WATER) return;
     eventBus.emit('camera:sway', { intensity: (CRITICAL_WATER - water) / CRITICAL_WATER });

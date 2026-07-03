@@ -15,6 +15,8 @@ const MIN_DURATION_MS = 2500;
 export function showDialogueLine(line, speakerLabel) {
   const el = document.createElement('p');
   el.className = 'victor-subtitle character-dialogue';
+  el.setAttribute('aria-live', 'polite');
+  el.setAttribute('role', 'status');
   el.textContent = speakerLabel ? `${speakerLabel}: ${line.text}` : line.text;
   document.body.appendChild(el);
   requestAnimationFrame(() => el.classList.add('victor-subtitle--visible'));

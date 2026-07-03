@@ -118,11 +118,11 @@ function showJournalInput() {
   overlay.innerHTML = `
     <div class="campfire-journal-paper">
       <p class="campfire-journal-title">Asha's Journal — Day ${day}</p>
-      <textarea class="campfire-journal-textarea" maxlength="${CHAR_LIMIT}" placeholder="What happened today..."></textarea>
+      <textarea class="campfire-journal-textarea" maxlength="${CHAR_LIMIT}" placeholder="What happened today..." aria-label="Write in Asha's journal"></textarea>
       <p class="campfire-journal-counter">0 / ${CHAR_LIMIT}</p>
       <div class="campfire-journal-buttons">
-        <button type="button" class="campfire-journal-close">Close</button>
-        <button type="button" class="campfire-journal-save">Save to journal</button>
+        <button type="button" class="campfire-journal-close" aria-label="Close without saving">Close</button>
+        <button type="button" class="campfire-journal-save" aria-label="Save journal entry">Save to journal</button>
       </div>
     </div>
   `;

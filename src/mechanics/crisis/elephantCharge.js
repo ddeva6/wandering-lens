@@ -35,20 +35,45 @@ const SILHOUETTE_SVG = `
 function buildOverlay(kind) {
   const overlay = document.createElement('div');
   overlay.className = `crisis-overlay crisis-elephant-overlay crisis-elephant-overlay--${kind}`;
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
   overlay.innerHTML = `
     <p class="crisis-elephant-title">READ THE BODY LANGUAGE</p>
     ${SILHOUETTE_SVG}
     <div class="crisis-choice-cards">
-      <button type="button" class="crisis-choice-card" data-choice="mock">MOCK CHARGE — Hold position</button>
-      <button type="button" class="crisis-choice-card" data-choice="real">REAL CHARGE — Reverse immediately</button>
+      <button type="button" class="crisis-choice-card" data-choice="mock" aria-label="Mock charge, hold position">MOCK CHARGE — Hold position</button>
+      <button type="button" class="crisis-choice-card" data-choice="real" aria-label="Real charge, reverse immediately">REAL CHARGE — Reverse immediately</button>
     </div>
-    <svg class="crisis-countdown" viewBox="0 0 40 40">
+    <svg class="crisis-countdown" viewBox="0 0 40 40" aria-live="polite" aria-label="5 seconds remaining">
       <circle class="crisis-countdown-track" cx="20" cy="20" r="17" />
       <circle class="crisis-countdown-arc" cx="20" cy="20" r="17" />
     </svg>
   `;
   overlay.addEventListener('click', (event) => event.stopPropagation());
   document.body.appendChild(overlay);
+
+  // Focus trap and keyboard navigation
+  const focusable = overlay.querySelectorAll('.crisis-choice-card');
+  const firstFocusable = focusable[0];
+  const lastFocusable = focusable[focusable.length - 1];
+  if (firstFocusable) firstFocusable.focus();
+
+  overlay.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      if (e.shiftKey) {
+        if (document.activeElement === firstFocusable) {
+          lastFocusable.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (document.activeElement === lastFocusable) {
+          firstFocusable.focus();
+          e.preventDefault();
+        }
+      }
+    }
+  });
+
   requestAnimationFrame(() => {
     const arc = overlay.querySelector('.crisis-countdown-arc');
     arc.style.transitionDuration = `${COUNTDOWN_MS}ms`;

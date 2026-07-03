@@ -18,14 +18,16 @@ import {
   createGrassTexture,
   createHeightmapTexture,
 } from '../utils/proceduralTexture.js';
+import { isMobile } from '../core/renderer.js';
+import { loadingManager } from '../core/loadingManager.js';
 
 const SIZE = 2000;
-const SEGMENTS = 256;
+const SEGMENTS = isMobile ? 64 : 128;
 const DISPLACEMENT_SCALE = 40;
-const GRASS_REPEAT = 32;
+const GRASS_REPEAT = isMobile ? 20 : 40;
 
 function loadFileTexture(url, onLoad, missingLabel) {
-  new TextureLoader().load(url, onLoad, undefined, () => {
+  new TextureLoader(loadingManager).load(url, onLoad, undefined, () => {
     console.warn(`[ASSET MISSING] ${missingLabel} — using procedural placeholder`);
   });
 }

@@ -7,6 +7,8 @@
  */
 
 import { Color, DirectionalLight, HemisphereLight } from 'three';
+import { isMobile } from '../core/renderer.js';
+import { eventBus } from '../utils/eventBus.js';
 
 // Full day/night cycle: one in-game day passes in 4 real minutes.
 const REAL_SECONDS_PER_CYCLE = 4 * 60;
@@ -30,6 +32,13 @@ export function createDayNightCycle(scene, startTimeOfDay = 6.5 / 24) {
   const sun = new DirectionalLight(0xfff2dd, 2);
   const hemi = new HemisphereLight(0x87ceeb, 0x4a3b28, 0.5);
   scene.add(sun, hemi);
+
+  let playerPosition = { x: 0, z: 0 };
+  let lastFogPos = { x: -Infinity, z: -Infinity };
+
+  eventBus.on('jeep:positionUpdate', ({ position }) => {
+    playerPosition = position;
+  });
 
   function skyColourAt(t) {
     if (t < DAWN_START) return sky.copy(NIGHT);
@@ -59,7 +68,17 @@ export function createDayNightCycle(scene, startTimeOfDay = 6.5 / 24) {
 
     skyColourAt(timeOfDay).multiplyScalar(modifiers.skyTint);
     if (scene.background instanceof Color) scene.background.copy(sky);
-    if (scene.fog) scene.fog.color.copy(sky);
+
+    let shouldUpdateFog = true;
+    if (isMobile) {
+      const dist = Math.hypot(playerPosition.x - lastFogPos.x, playerPosition.z - lastFogPos.z);
+      if (dist <= 5) {
+        shouldUpdateFog = false;
+      } else {
+        lastFogPos = { x: playerPosition.x, z: playerPosition.z };
+      }
+    }
+    if (shouldUpdateFog && scene.fog) scene.fog.color.copy(sky);
   }
 
   return {

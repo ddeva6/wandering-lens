@@ -8,6 +8,7 @@
 
 import { eventBus } from '../utils/eventBus.js';
 import { save } from '../utils/localStorage.js';
+import { prefersReducedMotion } from '../core/camera.js';
 
 const FADE_DURATION_MS = 3000;
 const QUOTE_DURATION_MS = 4000;
@@ -49,12 +50,15 @@ function buildCard(card) {
   const el = document.createElement('div');
   el.className = 'ending-card';
   el.dataset.ending = card.ending;
+  el.setAttribute('role', 'button');
+  el.setAttribute('tabindex', '0');
+  el.setAttribute('aria-label', `${card.title}. ${card.subtitle} Consequence: ${card.consequence}`);
   el.innerHTML = `
     <div class="ending-card-icon">${card.icon}</div>
     <p class="ending-card-title">${card.title}</p>
     <p class="ending-card-subtitle">${card.subtitle}</p>
     <p class="ending-card-consequence">${card.consequence}</p>
-    <button type="button" class="ending-card-button">${card.button}</button>
+    <button type="button" class="ending-card-button" tabindex="-1">${card.button}</button>
   `;
   return el;
 }
@@ -65,17 +69,20 @@ function resolveSelection(overlay, chosen) {
     else card.classList.add('ending-card--faded');
   });
 
+  const delay = prefersReducedMotion ? 0 : SELECTION_PAUSE_MS;
   setTimeout(() => {
     save('ending_chosen', chosen);
     overlay.remove();
     eventBus.emit('story:endingChosen', { ending: chosen });
     eventBus.emit('controls:unfreeze');
-  }, SELECTION_PAUSE_MS);
+  }, delay);
 }
 
 function buildOverlay() {
   const overlay = document.createElement('div');
   overlay.className = 'ending-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
   overlay.innerHTML = `
     <p class="ending-quote">
       "Whatever you found here — the decision is yours. Not mine. It was always yours."<br />
@@ -89,19 +96,48 @@ function buildOverlay() {
   const cardsContainer = overlay.querySelector('.ending-cards');
   const noWrongAnswer = overlay.querySelector('.ending-no-wrong-answer');
 
+  const quoteDuration = prefersReducedMotion ? 0 : QUOTE_DURATION_MS;
   setTimeout(() => {
     overlay.querySelector('.ending-quote').classList.add('ending-quote--fading');
     CARDS.forEach((card) => cardsContainer.appendChild(buildCard(card)));
     cardsContainer.classList.add('ending-cards--visible');
 
-    overlay.querySelectorAll('.ending-card-button').forEach((btn) => {
-      btn.addEventListener('click', (event) => {
-        resolveSelection(overlay, event.target.closest('.ending-card').dataset.ending);
+    const endingCards = overlay.querySelectorAll('.ending-card');
+    endingCards.forEach((card) => {
+      const select = () => resolveSelection(overlay, card.dataset.ending);
+      card.addEventListener('click', select);
+      card.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          select();
+        }
       });
     });
 
-    setTimeout(() => noWrongAnswer.classList.add('ending-no-wrong-answer--visible'), NO_WRONG_ANSWER_DELAY_MS);
-  }, QUOTE_DURATION_MS);
+    // Focus trap and keyboard navigation
+    if (endingCards.length > 0) endingCards[0].focus();
+
+    overlay.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        const firstFocusable = endingCards[0];
+        const lastFocusable = endingCards[endingCards.length - 1];
+        if (e.shiftKey) {
+          if (document.activeElement === firstFocusable) {
+            lastFocusable.focus();
+            e.preventDefault();
+          }
+        } else {
+          if (document.activeElement === lastFocusable) {
+            firstFocusable.focus();
+            e.preventDefault();
+          }
+        }
+      }
+    });
+
+    const wrongAnswerDelay = prefersReducedMotion ? 0 : NO_WRONG_ANSWER_DELAY_MS;
+    setTimeout(() => noWrongAnswer.classList.add('ending-no-wrong-answer--visible'), wrongAnswerDelay);
+  }, quoteDuration);
 
   return overlay;
 }
@@ -110,10 +146,15 @@ function beginEndingSequence() {
   eventBus.emit('controls:freeze');
   const canvas = document.getElementById('game-canvas');
   if (canvas) {
-    canvas.style.transition = `filter ${FADE_DURATION_MS}ms ease`;
+    if (prefersReducedMotion) {
+      canvas.style.transition = 'none';
+    } else {
+      canvas.style.transition = `filter ${FADE_DURATION_MS}ms ease`;
+    }
     canvas.style.filter = 'brightness(0.4)';
   }
-  setTimeout(buildOverlay, FADE_DURATION_MS);
+  const fadeDuration = prefersReducedMotion ? 0 : FADE_DURATION_MS;
+  setTimeout(buildOverlay, fadeDuration);
 }
 
 export function init() {
