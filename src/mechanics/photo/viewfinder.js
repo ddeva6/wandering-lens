@@ -7,7 +7,7 @@
  */
 
 import { load } from '../../utils/localStorage.js';
-import { DEFAULT_RESOURCES } from '../resources.js';
+import { DEFAULT_RESOURCES } from '../survival/resourceManager.js';
 import * as timingMeter from './timingMeter.js';
 import * as distanceMeter from './distanceMeter.js';
 import * as momentDetector from './momentDetector.js';

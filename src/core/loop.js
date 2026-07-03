@@ -10,6 +10,8 @@ import { Clock } from 'three';
 import { AnimalManager } from '../animals/AnimalManager.js';
 import * as viewfinder from '../mechanics/photo/viewfinder.js';
 import { setNearestDistance } from '../mechanics/photo/distanceMeter.js';
+import { resourceManager } from '../mechanics/survival/resourceManager.js';
+import { getDistanceDrivenThisFrame } from '../jeep/jeepPhysics.js';
 
 export function createLoop(renderer, scene, camera, terrain) {
   const clock = new Clock();
@@ -27,6 +29,7 @@ export function createLoop(renderer, scene, camera, terrain) {
     }
     animalManager.update(delta);
     setNearestDistance(animalManager.getNearestAnimalDistance());
+    resourceManager.update(delta, getDistanceDrivenThisFrame());
     if (viewfinder.isActive()) viewfinder.draw();
 
     renderer.render(scene, camera);

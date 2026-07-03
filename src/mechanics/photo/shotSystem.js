@@ -20,11 +20,10 @@ const LEGENDARY_THRESHOLD = 80;
 const STANDARD_COST = 1;
 const LEGENDARY_COST = 3;
 
-// Set once by main.js with the live resources controller from
-// mechanics/resources.js — sharing that single in-memory object (rather
-// than shotSystem doing its own independent localStorage round trip)
-// avoids resources.js's periodic 1s autosave clobbering a shot's film
-// deduction.
+// Set once by main.js with resourceManager (mechanics/survival/resourceManager.js)
+// — sharing its single in-memory object, rather than shotSystem doing its
+// own independent localStorage round trip, avoids resourceManager's
+// periodic autosave clobbering a shot's film deduction.
 let resourcesController = null;
 
 export function init(controller) {

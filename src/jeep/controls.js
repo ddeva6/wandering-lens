@@ -7,6 +7,7 @@
  */
 
 import nipplejs from 'nipplejs';
+import { eventBus } from '../utils/eventBus.js';
 
 const MOUSE_SENSITIVITY = 0.002;
 const SWIPE_SENSITIVITY = 0.005;
@@ -32,9 +33,19 @@ function clampPitch(value) {
 export function createControls(canvas) {
   const keys = { forward: false, backward: false, left: false, right: false };
   const look = { yaw: 0, pitch: 0.15 };
+  let frozen = false;
+
+  eventBus.on('controls:freeze', () => {
+    frozen = true;
+    keys.forward = keys.backward = keys.left = keys.right = false;
+  });
+  eventBus.on('controls:unfreeze', () => {
+    frozen = false;
+  });
 
   // --- Desktop: WASD + pointer-lock mouse look -------------------------
   window.addEventListener('keydown', (event) => {
+    if (frozen) return;
     const action = KEY_MAP[event.code];
     if (action) keys[action] = true;
   });
@@ -47,6 +58,7 @@ export function createControls(canvas) {
     if (document.pointerLockElement !== canvas) canvas.requestPointerLock();
   });
   document.addEventListener('mousemove', (event) => {
+    if (frozen) return;
     if (document.pointerLockElement !== canvas) return;
     look.yaw -= event.movementX * MOUSE_SENSITIVITY;
     look.pitch = clampPitch(look.pitch + event.movementY * MOUSE_SENSITIVITY);
@@ -72,6 +84,7 @@ export function createControls(canvas) {
       size: 110,
     });
     joystick.on('move', (event, data) => {
+      if (frozen) return;
       const { x, y } = data.vector;
       keys.forward = y > JOYSTICK_THRESHOLD;
       keys.backward = y < -JOYSTICK_THRESHOLD;
@@ -88,7 +101,7 @@ export function createControls(canvas) {
       lastTouch = { id: touch.identifier, x: touch.clientX, y: touch.clientY };
     });
     swipeZone.addEventListener('touchmove', (event) => {
-      if (!lastTouch) return;
+      if (frozen || !lastTouch) return;
       for (const touch of event.changedTouches) {
         if (touch.identifier !== lastTouch.id) continue;
         look.yaw -= (touch.clientX - lastTouch.x) * SWIPE_SENSITIVITY;

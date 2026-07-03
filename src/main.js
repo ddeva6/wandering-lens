@@ -8,7 +8,7 @@
 
 import { createRenderer, resizeRenderer } from './core/renderer.js';
 import { createScene } from './core/scene.js';
-import { createCamera, resizeCamera } from './core/camera.js';
+import { createCamera, resizeCamera, applyCameraEffects, getCinematicOverride } from './core/camera.js';
 import { createLoop } from './core/loop.js';
 import { createTerrain } from './world/terrain.js';
 import { createSkybox } from './world/skybox.js';
@@ -16,7 +16,7 @@ import { createDayNightCycle } from './world/dayNightCycle.js';
 import { createWeather } from './world/weather.js';
 import { createSoundManager } from './audio/soundManager.js';
 import { createJeep } from './jeep/jeepModel.js';
-import { applyDriving, getSpeed } from './jeep/jeepPhysics.js';
+import { applyDriving, getSpeed, resetDistanceDrivenThisFrame } from './jeep/jeepPhysics.js';
 import { createControls } from './jeep/controls.js';
 import { initEngineCut, getEngineState } from './jeep/engineCut.js';
 import {
@@ -27,7 +27,14 @@ import {
   EYE_LEVEL,
 } from './jeep/onFootMode.js';
 import { createDashboard } from './jeep/dashboard.js';
-import { createResources } from './mechanics/resources.js';
+import { resourceManager } from './mechanics/survival/resourceManager.js';
+import * as dehydrationFX from './mechanics/survival/dehydrationFX.js';
+import * as lionCharge from './mechanics/crisis/lionCharge.js';
+import * as elephantCharge from './mechanics/crisis/elephantCharge.js';
+import * as flashFlood from './mechanics/crisis/flashFlood.js';
+import * as wildfire from './mechanics/crisis/wildfire.js';
+import * as hyenaCamp from './mechanics/crisis/hyenaCamp.js';
+import * as comebackManager from './mechanics/comeback/comebackManager.js';
 import { setGameHour } from './world/dayNight.js';
 import { eventBus } from './utils/eventBus.js';
 import { save, load } from './utils/localStorage.js';
@@ -39,6 +46,12 @@ const CHASE_DISTANCE = 12;
 const CHASE_HEIGHT = 5;
 
 function updateChaseCamera(camera, jeep, look) {
+  const cinematic = getCinematicOverride();
+  if (cinematic) {
+    camera.position.set(cinematic.position.x, cinematic.position.y, cinematic.position.z);
+    camera.lookAt(cinematic.lookAt.x, cinematic.lookAt.y, cinematic.lookAt.z);
+    return;
+  }
   if (isOnFoot()) {
     const player = getPlayerPosition();
     const eyeY = player.y + EYE_LEVEL;
@@ -48,6 +61,7 @@ function updateChaseCamera(camera, jeep, look) {
       eyeY - Math.sin(look.pitch),
       player.z - Math.cos(look.yaw) * Math.cos(look.pitch)
     );
+    applyCameraEffects(camera);
     return;
   }
   const yaw = jeep.rotation.y + look.yaw;
@@ -58,6 +72,7 @@ function updateChaseCamera(camera, jeep, look) {
     target.z + Math.cos(yaw) * CHASE_DISTANCE
   );
   camera.lookAt(target.x, target.y + 1.5, target.z);
+  applyCameraEffects(camera);
 }
 
 function start() {
@@ -73,35 +88,41 @@ function start() {
   createSoundManager();
 
   const loop = createLoop(renderer, scene, camera, terrain);
-  const resources = createResources();
+  resourceManager.init();
   const jeep = createJeep(scene);
   const controls = createControls(canvas);
   const dashboard = createDashboard(jeep.group);
   initEngineCut();
 
   if (load('photo_album', null) === null) save('photo_album', []);
-  initShotSystem(resources);
+  initShotSystem(resourceManager);
   viewfinderUI.init();
   photoComparison.init();
+  dehydrationFX.init();
+  lionCharge.init();
+  elephantCharge.init();
+  flashFlood.init();
+  wildfire.init();
+  hyenaCamp.init();
+  comebackManager.init();
 
   loop.add((delta) => {
     weather.update(delta);
     dayNight.update(delta, weather.getModifiers());
     setGameHour(dayNight.getHour());
 
-    let metres = 0;
     if (isOnFoot()) {
+      resetDistanceDrivenThisFrame();
       updateWalk(delta, controls.keys, controls.getLook().yaw);
       const player = getPlayerPosition();
       player.y = terrain.getHeightAt(player.x, player.z);
       eventBus.emit('jeep:positionUpdate', { position: player });
     } else {
-      metres = applyDriving(delta, controls.keys, jeep.group);
+      applyDriving(delta, controls.keys, jeep.group);
       const ground = terrain.getHeightAt(jeep.group.position.x, jeep.group.position.z);
       jeep.group.position.y = ground + 1;
     }
-    resources.update(delta, metres);
-    updateOnFootMode(resources.get(), jeep.group);
+    updateOnFootMode(resourceManager.get(), jeep.group);
     dashboard.update(delta);
     updateChaseCamera(camera, jeep.group, controls.getLook());
   });
@@ -118,11 +139,13 @@ function start() {
       jeep: jeep.group,
       getEngineState,
       getSpeed,
-      resources,
+      resources: resourceManager,
       isOnFoot,
       animalManager: loop.animalManager,
+      eventBus,
     };
-    console.log('[WL] Phase 5 running — jeep, animal AI, photo mechanic');
+    window.eventBus = eventBus;
+    console.log('[WL] Phase 6 running — jeep, animal AI, photo mechanic, survival systems');
   }
 }
 

@@ -15,7 +15,7 @@ import {
   SRGBColorSpace,
 } from 'three';
 import { load } from '../utils/localStorage.js';
-import { DEFAULT_RESOURCES } from '../mechanics/resources.js';
+import { DEFAULT_RESOURCES } from '../mechanics/survival/resourceManager.js';
 
 const REFRESH_SECONDS = 1;
 const CANVAS_W = 256;

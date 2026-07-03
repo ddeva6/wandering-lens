@@ -22,11 +22,21 @@ const LOD_MID_INTERVAL = 3;
 const LOD_FAR_INTERVAL = 10;
 const OUT_OF_RANGE = 600;
 
+// Only one AnimalManager exists per session (created in core/loop.js) —
+// this lets Phase 6 crisis modules reach a specific charging animal's mesh
+// without loop.js having to prop-drill the instance through every module.
+let currentInstance = null;
+
+export function getAnimalManager() {
+  return currentInstance;
+}
+
 export class AnimalManager {
   constructor(scene, terrain) {
     this.scene = scene;
     this.playerPosition = { x: 0, z: 0 };
     this.frameCount = 0;
+    currentInstance = this;
 
     this.elephantHerd = new ElephantHerd(scene);
     this.lionPride = new LionPride(scene, terrain);

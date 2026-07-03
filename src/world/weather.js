@@ -65,7 +65,12 @@ export function createWeather(scene) {
     const k = 1 - Math.exp(-delta * LERP_RATE);
     modifiers.lightFactor += (target.lightFactor - modifiers.lightFactor) * k;
     modifiers.skyTint += (target.skyTint - modifiers.skyTint) * k;
-    scene.fog.far += (target.fogFar - scene.fog.far) * k;
+    // Wildfire crisis events take temporary direct control of fog.far for
+    // the "visibility cut to ~15m" effect — skip our own easing until they
+    // hand control back, or every render frame would fight their override.
+    if (!scene.fog.wildfireOverride) {
+      scene.fog.far += (target.fogFar - scene.fog.far) * k;
+    }
   }
 
   return {

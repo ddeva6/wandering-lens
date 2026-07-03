@@ -19,6 +19,7 @@ const KMH_TO_MS = 1 / 3.6;
 
 let speed = 0;
 const velocity = { x: 0, z: 0 };
+let distanceDrivenThisFrame = 0;
 
 export function getSpeed() {
   return speed;
@@ -28,6 +29,18 @@ export function getSpeed() {
 // to compare travel direction against the jeep-to-animal vector.
 export function getVelocity() {
   return velocity;
+}
+
+// Metres driven on the most recent applyDriving() call, read by
+// resourceManager for fuel depletion. Frames where the jeep isn't driven
+// (e.g. on-foot mode) must call resetDistanceDrivenThisFrame() so this
+// doesn't stay stuck at a stale non-zero value.
+export function getDistanceDrivenThisFrame() {
+  return distanceDrivenThisFrame;
+}
+
+export function resetDistanceDrivenThisFrame() {
+  distanceDrivenThisFrame = 0;
 }
 
 // Advances the jeep one frame. Returns metres driven this frame so the
@@ -60,5 +73,6 @@ export function applyDriving(delta, keys, jeep) {
 
   eventBus.emit('jeep:positionUpdate', { position: jeep.position });
 
-  return Math.abs(metres);
+  distanceDrivenThisFrame = Math.abs(metres);
+  return distanceDrivenThisFrame;
 }
