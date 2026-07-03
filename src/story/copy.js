@@ -101,5 +101,6 @@ export const copy = {
     plateauView: 'This is where he used to watch the migration. You can see everything from here.',
     persistence:
       '"The savanna doesn\'t reward the lucky. It rewards the ones who stayed." — Victor Osei Mensah, 1987',
+    radioMamaMissed: "Missed Radio Mama's check-in last night.",
   },
 };

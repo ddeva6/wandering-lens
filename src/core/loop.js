@@ -15,7 +15,7 @@ import { getDistanceDrivenThisFrame } from '../jeep/jeepPhysics.js';
 import { getTimeScale } from '../story/voiceSystem.js';
 import { amara } from '../characters/amara/AmaraCharacter.js';
 import { isaac } from '../characters/isaac/IsaacCharacter.js';
-import { updateFrustum, frustum, prefersReducedMotion } from './camera.js';
+import { updateFrustum, frustum } from './camera.js';
 import { updateCrates } from '../mechanics/isaacGifts.js';
 import { updateComebackObjects } from '../mechanics/comeback/comebackManager.js';
 

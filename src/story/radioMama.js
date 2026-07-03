@@ -80,7 +80,7 @@ export function init() {
 
     if (hour === MORNING_HOUR && load('pending_missed_notification', false)) {
       save('pending_missed_notification', false);
-      showSubtitle("Missed Radio Mama's check-in last night.", 4000);
+      showSubtitle(copy.subtitles.radioMamaMissed, 4000);
     }
   });
 
