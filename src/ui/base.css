@@ -14,3 +14,174 @@ body {
   height: 100%;
   touch-action: none;
 }
+
+.joystick-zone {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 40%;
+  height: 45%;
+  z-index: 10;
+  touch-action: none;
+}
+
+.swipe-zone {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 55%;
+  height: 100%;
+  z-index: 9;
+  touch-action: none;
+}
+
+.dehydration-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    rgba(139, 90, 43, 0) 0%,
+    rgba(139, 90, 43, 0.4) 100%
+  );
+  transition: opacity 0.3s ease;
+}
+
+.viewfinder-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.shutter-flash {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 150;
+  pointer-events: none;
+}
+
+.legendary-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.legendary-confirm-text {
+  font-size: 18px;
+  letter-spacing: 0.05em;
+}
+
+.legendary-confirm-buttons {
+  display: flex;
+  gap: 16px;
+}
+
+.legendary-confirm-buttons button {
+  padding: 12px 28px;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.legendary-confirm-commit {
+  background: #ffd700;
+  color: #1a1a1a;
+}
+
+.legendary-confirm-cancel {
+  background: #4a4a4a;
+  color: #ffffff;
+}
+
+.photo-comparison-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: stretch;
+  background: #0a0a0a;
+  color: #ffffff;
+  font-family: sans-serif;
+}
+
+.photo-comparison-panel {
+  width: 45%;
+  padding: 32px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+}
+
+.photo-comparison-victor {
+  filter: sepia(0.6);
+}
+
+.photo-comparison-gold-border {
+  box-shadow: inset 0 0 0 2px #ffd700;
+}
+
+.photo-comparison-divider {
+  width: 10%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32px 0;
+  box-sizing: border-box;
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+}
+
+.photo-comparison-label {
+  letter-spacing: 0.1em;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.photo-comparison-score {
+  font-size: 48px;
+  font-weight: bold;
+}
+
+.photo-comparison-grain {
+  opacity: 0.85;
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.2);
+}
+
+.photo-comparison-note {
+  font-size: 14px;
+  line-height: 1.5;
+  font-style: italic;
+  opacity: 0.9;
+}
+
+.photo-comparison-verdict {
+  position: absolute;
+  bottom: 32px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 15px;
+  letter-spacing: 0.05em;
+}

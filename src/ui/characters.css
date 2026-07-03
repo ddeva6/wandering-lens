@@ -1,0 +1,109 @@
+.character-dialogue {
+  border-top: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.birdtest-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 155;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #ffffff;
+  font-family: sans-serif;
+}
+
+.birdtest-card {
+  width: 220px;
+  height: 160px;
+  border-radius: 8px;
+  background: #1c1c1c;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.birdtest-waveform {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  opacity: 0.6;
+  transition: transform 0.2s ease;
+}
+
+.birdtest-waveform--playing {
+  animation: birdtest-pulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes birdtest-pulse {
+  from { transform: scale(0.9); opacity: 0.5; }
+  to { transform: scale(1.05); opacity: 0.9; }
+}
+
+.birdtest-name {
+  font-size: 15px;
+  letter-spacing: 0.05em;
+}
+
+.birdtest-timer-track {
+  width: 260px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.birdtest-timer-fill {
+  height: 100%;
+  width: 100%;
+  background: #ffd700;
+  transform-origin: left;
+}
+
+.birdtest-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 320px;
+}
+
+.birdtest-option {
+  padding: 10px;
+  background: #2a2a2a;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.birdtest-option:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.birdtest-score {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.birdtest-flash {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  animation: birdtest-flash-fade 0.5s ease-out forwards;
+}
+
+.birdtest-flash--good { background: rgba(0, 255, 100, 0.2); }
+.birdtest-flash--bad { background: rgba(255, 0, 0, 0.2); }
+
+@keyframes birdtest-flash-fade {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}

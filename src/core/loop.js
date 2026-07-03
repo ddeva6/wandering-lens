@@ -7,26 +7,43 @@
  */
 
 import { Clock } from 'three';
+import { AnimalManager } from '../animals/AnimalManager.js';
+import * as viewfinder from '../mechanics/photo/viewfinder.js';
+import { setNearestDistance } from '../mechanics/photo/distanceMeter.js';
+import { resourceManager } from '../mechanics/survival/resourceManager.js';
+import { getDistanceDrivenThisFrame } from '../jeep/jeepPhysics.js';
+import { getTimeScale } from '../story/voiceSystem.js';
+import { amara } from '../characters/amara/AmaraCharacter.js';
+import { isaac } from '../characters/isaac/IsaacCharacter.js';
 
-export function createLoop(renderer, scene, camera) {
+export function createLoop(renderer, scene, camera, terrain) {
   const clock = new Clock();
   const updatables = [];
+  const animalManager = new AnimalManager(scene, terrain);
   let running = false;
 
   function tick() {
     if (!running) return;
-    const delta = clock.getDelta();
+    const realDelta = clock.getDelta();
+    const delta = realDelta * getTimeScale();
     const elapsed = clock.getElapsedTime();
 
     for (const update of updatables) {
       update(delta, elapsed);
     }
+    animalManager.update(delta);
+    setNearestDistance(animalManager.getNearestAnimalDistance());
+    resourceManager.update(realDelta, getDistanceDrivenThisFrame());
+    amara.update(delta);
+    isaac.update(delta);
+    if (viewfinder.isActive()) viewfinder.draw();
 
     renderer.render(scene, camera);
     requestAnimationFrame(tick);
   }
 
   return {
+    animalManager,
     // update: (delta, elapsed) => void
     add(update) {
       updatables.push(update);
