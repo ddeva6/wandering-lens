@@ -48,6 +48,14 @@ import * as isaacGifts from './mechanics/isaacGifts.js';
 import { amara } from './characters/amara/AmaraCharacter.js';
 import { isaac } from './characters/isaac/IsaacCharacter.js';
 import { gpsTrackerReveal } from './mechanics/gpsTrackerReveal.js';
+import * as endingTrigger from './story/endingTrigger.js';
+import * as endingChoiceUI from './ui/endingChoiceUI.js';
+import * as publishEnding from './story/endings/publishEnding.js';
+import * as buryEnding from './story/endings/buryEnding.js';
+import * as returnEnding from './story/endings/returnEnding.js';
+import * as victorsChallenge from './story/victorsChallenge.js';
+import * as journalUI from './ui/journalUI.js';
+import * as worldEndingVisuals from './story/endings/worldEndingVisuals.js';
 
 const CHASE_DISTANCE = 12;
 const CHASE_HEIGHT = 5;
@@ -112,6 +120,13 @@ function start() {
     save('amara_tests', { test1: false, test2: false, test3: false });
   }
 
+  if (load('wl_ending_triggered', null) === null) save('wl_ending_triggered', false);
+  if (load('wl_ending_chosen', null) === null) save('wl_ending_chosen', null);
+  if (load('wl_victors_challenge_unlocked', null) === null) save('wl_victors_challenge_unlocked', false);
+  if (load('wl_victors_challenge_active', null) === null) save('wl_victors_challenge_active', false);
+  if (load('wl_victors_challenge_progress', null) === null) save('wl_victors_challenge_progress', {});
+  if (load('wl_victors_challenge_complete', null) === null) save('wl_victors_challenge_complete', false);
+
   initShotSystem(resourceManager);
   viewfinderUI.init();
   photoComparison.init();
@@ -129,6 +144,15 @@ function start() {
   amara.init(scene, jeep.group);
   isaac.init(scene);
   gpsTrackerReveal.init();
+
+  endingTrigger.init();
+  endingChoiceUI.init();
+  publishEnding.init();
+  buryEnding.init();
+  returnEnding.init();
+  victorsChallenge.init();
+  journalUI.init();
+  worldEndingVisuals.init(scene);
 
   eventBus.emit('game:start');
 

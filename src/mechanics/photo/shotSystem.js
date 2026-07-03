@@ -10,6 +10,8 @@ import { save, load } from '../../utils/localStorage.js';
 import { eventBus } from '../../utils/eventBus.js';
 import { getGameHour } from '../../world/dayNight.js';
 import { getTimingScore } from './timingMeter.js';
+import { victorAttempts } from '../../story/victorAttempts.js';
+import { getPlayerPosition } from '../../jeep/onFootMode.js';
 import { getDistanceScore } from './distanceMeter.js';
 import { getMomentScore, getActiveMoment } from './momentDetector.js';
 
@@ -87,7 +89,30 @@ export function takeShot(isLegendary = false) {
   save('photo_album', album);
 
   eventBus.emit('photo:taken', shot);
-  if (isLegendary) eventBus.emit('photo:legendary', shot);
+  if (isLegendary) {
+    eventBus.emit('photo:legendary', shot);
+
+    // Check against Victor's challenge
+    if (load('wl_victors_challenge_active', false)) {
+      const pos = getPlayerPosition();
+      let zone = 'centre';
+      if (pos.x < -100) zone = 'west';
+      else if (pos.x > 100) zone = 'east';
+      else if (pos.z < -100) zone = 'north';
+      else if (pos.z > 100) zone = 'south';
+
+      const match = victorAttempts.find(entry =>
+        entry.species === shot.species &&
+        entry.zone === zone &&
+        entry.requiredMoment === (activeMoment ? activeMoment.type : null) &&
+        Math.random() < (entry.rarity || 0.15)
+      );
+
+      if (match) {
+        eventBus.emit('challenge:shotMatched', { entry: match, shot });
+      }
+    }
+  }
 
   eventBus.emit('journal:unlock', { tier: unlockTier(score), species: shot.species, score });
 
