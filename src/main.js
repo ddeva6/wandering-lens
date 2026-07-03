@@ -6,9 +6,9 @@
  * https://github.com/ddeva6/wandering-lens
  */
 
-import { createRenderer, resizeRenderer } from './core/renderer.js';
+import { createRenderer } from './core/renderer.js';
 import { createScene } from './core/scene.js';
-import { createCamera, resizeCamera, applyCameraEffects, getCinematicOverride, prefersReducedMotion } from './core/camera.js';
+import { createCamera, applyCameraEffects, getCinematicOverride, prefersReducedMotion } from './core/camera.js';
 import { createLoop } from './core/loop.js';
 import { createTerrain } from './world/terrain.js';
 import { createSkybox } from './world/skybox.js';
@@ -162,11 +162,6 @@ function start() {
     updateOnFootMode(resourceManager.get(), jeep.group);
     dashboard.update(delta);
     updateChaseCamera(camera, jeep.group, controls.getLook());
-  });
-
-  window.addEventListener('resize', () => {
-    resizeCamera(camera);
-    resizeRenderer(renderer);
   });
 
   loop.start();
