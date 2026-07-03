@@ -53,6 +53,20 @@ export class AnimalManager {
     return distance2D(animalGroup.position ?? animalGroup.mesh.position, this.playerPosition);
   }
 
+  // Distance to the single closest individual animal (not herd centre),
+  // used by the Phase 5 distance meter.
+  getNearestAnimalDistance() {
+    let nearest = Infinity;
+    this.groups.forEach((group) => {
+      const members = group.members ?? [group];
+      members.forEach((animal) => {
+        const dist = distance2D(animal.mesh.position, this.playerPosition);
+        if (dist < nearest) nearest = dist;
+      });
+    });
+    return nearest;
+  }
+
   update(delta) {
     this.frameCount += 1;
     this.waterhole.attractAnimals(getGameHour());

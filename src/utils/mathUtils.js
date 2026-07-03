@@ -49,3 +49,19 @@ export function randomInRadius(centerX, centerZ, radius) {
   const r = Math.random() * radius;
   return { x: centerX + Math.cos(angle) * r, z: centerZ + Math.sin(angle) * r };
 }
+
+export function lerp(a, b, t) {
+  return a + (b - a) * Math.min(1, Math.max(0, t));
+}
+
+// Interpolates between two '#rrggbb' hex colours, returned as 'rgb(r, g, b)'.
+export function lerpColor(hexA, hexB, t) {
+  const a = parseInt(hexA.slice(1), 16);
+  const b = parseInt(hexB.slice(1), 16);
+  const ar = (a >> 16) & 0xff, ag = (a >> 8) & 0xff, ab = a & 0xff;
+  const br = (b >> 16) & 0xff, bg = (b >> 8) & 0xff, bb = b & 0xff;
+  const r = Math.round(lerp(ar, br, t));
+  const g = Math.round(lerp(ag, bg, t));
+  const bl = Math.round(lerp(ab, bb, t));
+  return `rgb(${r}, ${g}, ${bl})`;
+}

@@ -30,6 +30,10 @@ import { createDashboard } from './jeep/dashboard.js';
 import { createResources } from './mechanics/resources.js';
 import { setGameHour } from './world/dayNight.js';
 import { eventBus } from './utils/eventBus.js';
+import { save, load } from './utils/localStorage.js';
+import * as viewfinderUI from './ui/viewfinderUI.js';
+import * as photoComparison from './mechanics/photo/photoComparison.js';
+import { init as initShotSystem } from './mechanics/photo/shotSystem.js';
 
 const CHASE_DISTANCE = 12;
 const CHASE_HEIGHT = 5;
@@ -75,6 +79,11 @@ function start() {
   const dashboard = createDashboard(jeep.group);
   initEngineCut();
 
+  if (load('photo_album', null) === null) save('photo_album', []);
+  initShotSystem(resources);
+  viewfinderUI.init();
+  photoComparison.init();
+
   loop.add((delta) => {
     weather.update(delta);
     dayNight.update(delta, weather.getModifiers());
@@ -113,7 +122,7 @@ function start() {
       isOnFoot,
       animalManager: loop.animalManager,
     };
-    console.log('[WL] Phase 4 running — jeep, controls, animal AI, memory, waterhole');
+    console.log('[WL] Phase 5 running — jeep, animal AI, photo mechanic');
   }
 }
 
