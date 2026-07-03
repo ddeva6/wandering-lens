@@ -9,153 +9,113 @@
 import { eventBus } from '../utils/eventBus.js';
 import { save } from '../utils/localStorage.js';
 
-function createIcon(svgPath) {
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('viewBox', '0 0 24 24');
-  svg.setAttribute('width', '24');
-  svg.setAttribute('height', '24');
-  svg.setAttribute('fill', 'none');
-  svg.setAttribute('stroke', 'currentColor');
-  svg.setAttribute('stroke-width', '2');
-  svg.setAttribute('stroke-linecap', 'round');
-  svg.setAttribute('stroke-linejoin', 'round');
-  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  path.setAttribute('d', svgPath);
-  svg.appendChild(path);
-  return svg;
+const FADE_DURATION_MS = 3000;
+const QUOTE_DURATION_MS = 4000;
+const NO_WRONG_ANSWER_DELAY_MS = 10000;
+const SELECTION_PAUSE_MS = 2000;
+
+const CAMERA_ICON = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M8 7l1.5-3h5L16 7"/><circle cx="12" cy="14" r="4"/></svg>';
+const GROUND_ICON = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 16c3-3 5-2 7 0s4 3 7 0 4-3 6 0"/><path d="M2 20h20"/><path d="M12 4v8"/><path d="M9 7l3-3 3 3"/></svg>';
+const HANDS_ICON = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="6" r="2.5"/><circle cx="17" cy="6" r="2.5"/><path d="M4 20c0-4 1.5-7 3-7s3 3 3 7"/><path d="M14 20c0-4 1.5-7 3-7s3 3 3 7"/><path d="M10 20c0-3 1-5 2-5s2 2 2 5"/></svg>';
+
+const CARDS = [
+  {
+    ending: 'publish',
+    icon: CAMERA_ICON,
+    title: 'PUBLISH',
+    subtitle: "Send Victor's evidence to his editor at National Geographic.",
+    consequence: 'His name is cleared. The operation is exposed. The world knows what happened here.',
+    button: 'Send the photographs',
+  },
+  {
+    ending: 'bury',
+    icon: GROUND_ICON,
+    title: 'BURY IT',
+    subtitle: 'Return the evidence to the ground where Victor hid it.',
+    consequence: 'The land stays hidden. The animals stay undisturbed. Some truths belong to the earth.',
+    button: 'Leave it where it rests',
+  },
+  {
+    ending: 'return',
+    icon: HANDS_ICON,
+    title: 'RETURN THE LAND',
+    subtitle: "Give Victor's coordinates and evidence to Amara's community.",
+    consequence: 'The Maasai file for stewardship. The land returns to those who have always known it.',
+    button: 'Give it to Amara',
+  },
+];
+
+function buildCard(card) {
+  const el = document.createElement('div');
+  el.className = 'ending-card';
+  el.dataset.ending = card.ending;
+  el.innerHTML = `
+    <div class="ending-card-icon">${card.icon}</div>
+    <p class="ending-card-title">${card.title}</p>
+    <p class="ending-card-subtitle">${card.subtitle}</p>
+    <p class="ending-card-consequence">${card.consequence}</p>
+    <button type="button" class="ending-card-button">${card.button}</button>
+  `;
+  return el;
 }
 
-function showOverlay() {
-  eventBus.emit('controls:freeze');
-
-  const canvas = document.getElementById('game-canvas');
-  if (canvas) {
-    canvas.style.transition = 'filter 3s';
-    canvas.style.filter = 'brightness(0.4)';
-  }
+function resolveSelection(overlay, chosen) {
+  overlay.querySelectorAll('.ending-card').forEach((card) => {
+    if (card.dataset.ending === chosen) card.classList.add('ending-card--selected');
+    else card.classList.add('ending-card--faded');
+  });
 
   setTimeout(() => {
-    const overlay = document.createElement('div');
-    overlay.className = 'ending-overlay';
+    save('ending_chosen', chosen);
+    overlay.remove();
+    eventBus.emit('story:endingChosen', { ending: chosen });
+    eventBus.emit('controls:unfreeze');
+  }, SELECTION_PAUSE_MS);
+}
 
-    const quote = document.createElement('div');
-    quote.className = 'ending-quote';
-    quote.innerHTML = `
-      <p>"Whatever you found here — the decision is yours. Not mine. It was always yours."</p>
-      <p class="ending-quote-author">— Victor Osei Mensah, Field Journal, 1993</p>
-    `;
-    overlay.appendChild(quote);
-    document.body.appendChild(overlay);
+function buildOverlay() {
+  const overlay = document.createElement('div');
+  overlay.className = 'ending-overlay';
+  overlay.innerHTML = `
+    <p class="ending-quote">
+      "Whatever you found here — the decision is yours. Not mine. It was always yours."<br />
+      <span class="ending-quote-attribution">— Victor Osei Mensah, Field Journal, 1993</span>
+    </p>
+    <div class="ending-cards"></div>
+    <p class="ending-no-wrong-answer">There is no wrong answer.</p>
+  `;
+  document.body.appendChild(overlay);
 
-    setTimeout(() => {
-      quote.style.opacity = '1';
-    }, 100);
+  const cardsContainer = overlay.querySelector('.ending-cards');
+  const noWrongAnswer = overlay.querySelector('.ending-no-wrong-answer');
 
-    setTimeout(() => {
-      const cardsContainer = document.createElement('div');
-      cardsContainer.className = 'ending-cards-container';
+  setTimeout(() => {
+    overlay.querySelector('.ending-quote').classList.add('ending-quote--fading');
+    CARDS.forEach((card) => cardsContainer.appendChild(buildCard(card)));
+    cardsContainer.classList.add('ending-cards--visible');
 
-      const cardsData = [
-        {
-          id: 'publish',
-          iconPath: 'M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z M12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
-          title: 'PUBLISH',
-          subtitle: "Send Victor's evidence to his editor at National Geographic.",
-          consequence: "His name is cleared. The operation is exposed. The world knows what happened here.",
-          buttonText: "Send the photographs"
-        },
-        {
-          id: 'bury',
-          iconPath: 'M2 12h20 M12 2v20 M12 12a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M4.93 4.93l14.14 14.14 M4.93 19.07L19.07 4.93', // Simple abstract earth
-          title: 'BURY IT',
-          subtitle: "Return the evidence to the ground where Victor hid it.",
-          consequence: "The land stays hidden. The animals stay undisturbed. Some truths belong to the earth.",
-          buttonText: "Leave it where it rests"
-        },
-        {
-          id: 'return',
-          iconPath: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z', // Simple abstract shield/hands
-          title: 'RETURN THE LAND',
-          subtitle: "Give Victor's coordinates and evidence to Amara's community.",
-          consequence: "The Maasai file for stewardship. The land returns to those who have always known it.",
-          buttonText: "Give it to Amara"
-        }
-      ];
-
-      const cards = cardsData.map(data => {
-        const card = document.createElement('div');
-        card.className = 'ending-card';
-
-        const iconDiv = document.createElement('div');
-        iconDiv.className = 'ending-card-icon';
-        iconDiv.appendChild(createIcon(data.iconPath));
-
-        const title = document.createElement('h3');
-        title.className = 'ending-card-title';
-        title.textContent = data.title;
-
-        const subtitle = document.createElement('p');
-        subtitle.className = 'ending-card-subtitle';
-        subtitle.textContent = data.subtitle;
-
-        const consequence = document.createElement('p');
-        consequence.className = 'ending-card-consequence';
-        consequence.textContent = data.consequence;
-
-        const button = document.createElement('button');
-        button.className = 'ending-card-button';
-        button.textContent = data.buttonText;
-
-        card.appendChild(iconDiv);
-        card.appendChild(title);
-        card.appendChild(subtitle);
-        card.appendChild(consequence);
-        card.appendChild(button);
-
-        card.addEventListener('click', () => {
-          cards.forEach(c => {
-            if (c !== card) {
-              c.classList.add('ending-card--faded');
-            }
-          });
-          card.classList.add('ending-card--selected');
-
-          setTimeout(() => {
-            save('ending_chosen', data.id);
-            overlay.remove();
-            if (canvas) {
-              canvas.style.transition = '';
-              canvas.style.filter = '';
-            }
-            eventBus.emit('story:endingChosen', { ending: data.id });
-            eventBus.emit('controls:unfreeze');
-          }, 2000);
-        });
-
-        return card;
+    overlay.querySelectorAll('.ending-card-button').forEach((btn) => {
+      btn.addEventListener('click', (event) => {
+        resolveSelection(overlay, event.target.closest('.ending-card').dataset.ending);
       });
+    });
 
-      cards.forEach(card => cardsContainer.appendChild(card));
-      overlay.appendChild(cardsContainer);
+    setTimeout(() => noWrongAnswer.classList.add('ending-no-wrong-answer--visible'), NO_WRONG_ANSWER_DELAY_MS);
+  }, QUOTE_DURATION_MS);
 
-      const smallText = document.createElement('p');
-      smallText.className = 'ending-small-text';
-      smallText.textContent = "There is no wrong answer.";
-      overlay.appendChild(smallText);
+  return overlay;
+}
 
-      setTimeout(() => {
-        cardsContainer.classList.add('ending-cards-container--visible');
-      }, 100);
-
-      setTimeout(() => {
-        smallText.classList.add('ending-small-text--visible');
-      }, 10000);
-
-    }, 4000);
-
-  }, 3000);
+function beginEndingSequence() {
+  eventBus.emit('controls:freeze');
+  const canvas = document.getElementById('game-canvas');
+  if (canvas) {
+    canvas.style.transition = `filter ${FADE_DURATION_MS}ms ease`;
+    canvas.style.filter = 'brightness(0.4)';
+  }
+  setTimeout(buildOverlay, FADE_DURATION_MS);
 }
 
 export function init() {
-  eventBus.on('story:endingUnlocked', showOverlay);
+  eventBus.on('story:endingUnlocked', beginEndingSequence);
 }

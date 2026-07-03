@@ -8,119 +8,90 @@
 
 import { eventBus } from '../utils/eventBus.js';
 import { save, load } from '../utils/localStorage.js';
-import { playFinalSequence } from './victorsChallengeFinale.js';
+import { victorAttempts } from './victorAttempts.js';
+import { playFinale } from './victorsChallengeFinale.js';
 
-function triggerUnlockSequence() {
-  if (load('victors_challenge_unlocked', false)) return;
-  save('victors_challenge_unlocked', true);
+const UNLOCK_SUBTITLE = 'Twelve shots he attempted and never got. Described in his journal. Find them.';
+const FOUND_DISMISS_MS = 6000;
+const FINALE_DELAY_MS = FOUND_DISMISS_MS + 800;
 
+// Deterministic 0.05–0.15 spread per entry (id 1-12) so the rarity roll is
+// stable across reloads instead of re-randomising every session.
+export const challengeEntries = victorAttempts.map((entry) => ({
+  ...entry,
+  rarity: 0.05 + (entry.id % 6) * 0.02,
+}));
+
+function showUnlockOverlay() {
   const overlay = document.createElement('div');
-  overlay.className = 'victor-challenge-unlock-overlay';
-
-  const style = document.createElement('style');
-  style.textContent = `
-    .victor-challenge-unlock-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 600;
-      background: rgba(0, 0, 0, 0.9);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-family: sans-serif;
-      text-align: center;
-      padding: 40px;
-    }
-    .victor-challenge-unlock-overlay h2 {
-      font-size: 24px;
-      letter-spacing: 0.1em;
-      margin-bottom: 16px;
-    }
-    .victor-challenge-unlock-overlay p {
-      font-size: 16px;
-      color: #cccccc;
-      max-width: 400px;
-      line-height: 1.5;
-      margin-bottom: 32px;
-    }
-    .victor-challenge-unlock-overlay button {
-      padding: 12px 24px;
-      font-size: 14px;
-      background: #ffd700;
-      color: black;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-  `;
-  document.head.appendChild(style);
-
+  overlay.className = 'challenge-unlock-overlay';
   overlay.innerHTML = `
-    <h2>Victor's Challenge</h2>
-    <p>Twelve shots he attempted and never got. Described in his journal. Find them.</p>
-    <button>Accept</button>
+    <h2 class="challenge-unlock-title">Victor's Challenge</h2>
+    <p class="challenge-unlock-subtitle">${UNLOCK_SUBTITLE}</p>
+    <button type="button" class="challenge-unlock-button">Accept</button>
   `;
   document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('challenge-unlock-overlay--visible'));
 
-  overlay.querySelector('button').addEventListener('click', () => {
+  overlay.querySelector('.challenge-unlock-button').addEventListener('click', () => {
     save('victors_challenge_active', true);
-    overlay.remove();
-    style.remove();
+    overlay.classList.remove('challenge-unlock-overlay--visible');
+    setTimeout(() => overlay.remove(), 600);
   });
 }
 
-function showMatchOverlay(entry, shot) {
-  const overlay = document.createElement('div');
-  overlay.style.position = 'fixed';
-  overlay.style.inset = '0';
-  overlay.style.zIndex = '600';
-  overlay.style.background = 'rgba(0,0,0,0.8)';
-  overlay.style.display = 'flex';
-  overlay.style.flexDirection = 'column';
-  overlay.style.alignItems = 'center';
-  overlay.style.justifyContent = 'center';
-  overlay.style.color = 'white';
-  overlay.style.fontFamily = 'sans-serif';
-  overlay.style.fontSize = '24px';
-  overlay.style.letterSpacing = '0.1em';
-
-  overlay.textContent = "VICTOR'S ATTEMPT — FOUND";
-  document.body.appendChild(overlay);
-
-  setTimeout(() => {
-    overlay.remove();
-    eventBus.emit('ui:showPhotoComparison', { shot, entry });
-  }, 3000);
+function unlockIfNeeded() {
+  if (load('victors_challenge_unlocked', false)) return;
+  save('victors_challenge_unlocked', true);
+  showUnlockOverlay();
 }
 
-function checkCompletion() {
+function buildFoundOverlay(entry, shot, completedCount) {
+  const overlay = document.createElement('div');
+  overlay.className = 'challenge-found-overlay';
+  overlay.innerHTML = `
+    <p class="challenge-found-title">VICTOR'S ATTEMPT — FOUND</p>
+    <div class="challenge-found-panels">
+      <div class="challenge-found-panel">
+        <p class="challenge-found-label">VICTOR — ${entry.year}</p>
+        <p class="challenge-found-score">${entry.victorScore}</p>
+        <p class="challenge-found-note">${entry.victorNote}</p>
+      </div>
+      <div class="challenge-found-panel challenge-found-panel--asha">
+        <p class="challenge-found-label">ASHA — NOW</p>
+        <p class="challenge-found-score">${shot.score}</p>
+      </div>
+    </div>
+    <p class="challenge-found-count">${completedCount} / ${challengeEntries.length}</p>
+  `;
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('challenge-found-overlay--visible'));
+
+  setTimeout(() => {
+    overlay.classList.remove('challenge-found-overlay--visible');
+    setTimeout(() => overlay.remove(), 600);
+  }, FOUND_DISMISS_MS);
+}
+
+function handleShotMatched({ entry, shot }) {
   const progress = load('victors_challenge_progress', {});
+  if (progress[entry.id]) return;
+
+  progress[entry.id] = { ashaScore: shot.score, victorScore: entry.victorScore, completedAt: Date.now() };
+  save('victors_challenge_progress', progress);
+
   const completedCount = Object.keys(progress).length;
-  if (completedCount >= 12 && !load('victors_challenge_complete', false)) {
+  buildFoundOverlay(entry, shot, completedCount);
+  eventBus.emit('challenge:progressUpdated', progress);
+
+  if (completedCount >= challengeEntries.length) {
     eventBus.emit('challenge:complete');
+    save('victors_challenge_active', false);
+    setTimeout(() => playFinale(), FINALE_DELAY_MS);
   }
 }
 
 export function init() {
-  eventBus.on('story:endingComplete', triggerUnlockSequence);
-
-  eventBus.on('challenge:shotMatched', ({ entry, shot }) => {
-    const progress = load('victors_challenge_progress', {});
-    if (!progress[entry.id]) {
-      progress[entry.id] = {
-        ashaScore: shot.score,
-        victorScore: entry.victorScore,
-        completedAt: Date.now()
-      };
-      save('victors_challenge_progress', progress);
-
-      showMatchOverlay(entry, shot);
-      checkCompletion();
-    }
-  });
-
-  eventBus.on('challenge:complete', playFinalSequence);
+  eventBus.on('story:endingComplete', unlockIfNeeded);
+  eventBus.on('challenge:shotMatched', handleShotMatched);
 }

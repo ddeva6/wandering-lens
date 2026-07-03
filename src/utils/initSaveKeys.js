@@ -10,8 +10,8 @@ import { save, load } from './localStorage.js';
 
 // One-time default seeding for every wl_ key that a module reads via
 // load(key, default) before anything has ever written to it. Centralised
-// here (rather than inline in main.js's start()) so that file stays under
-// its 200-line budget as new systems add their own keys.
+// here (rather than scattered through main.js's start()) so the list stays
+// under the file's 200-line budget as new systems add their own keys.
 export function initSaveKeys() {
   if (load('photo_album', null) === null) save('photo_album', []);
   if (load('played_recordings', null) === null) save('played_recordings', []);

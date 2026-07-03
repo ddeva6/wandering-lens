@@ -30,9 +30,7 @@ function dismiss() {
   overlay = null;
 }
 
-// Exported so victorsChallenge.js can reuse the exact same side-by-side
-// panel for a Victor's Challenge match, rather than duplicating the markup.
-export function buildOverlay(attempt, shot) {
+function buildOverlay(attempt, shot) {
   overlay = document.createElement('div');
   overlay.className = 'photo-comparison-overlay';
 
@@ -85,11 +83,5 @@ export function init() {
     if (!shot.species) return;
     const match = findMatch(shot.species);
     if (match) buildOverlay(match, shot);
-  });
-
-  // Victor's Challenge (src/story/victorsChallenge.js) reuses this same
-  // side-by-side panel for its own entry/shot pairs.
-  eventBus.on('ui:showPhotoComparison', ({ entry, shot }) => {
-    buildOverlay(entry, shot);
   });
 }

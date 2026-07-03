@@ -23,19 +23,19 @@ let distanceDrivenThisFrame = 0;
 let hasMovedBefore = false;
 let jeepRef = null;
 
+export function getSpeed() {
+  return speed;
+}
+
 // Registered once by main.js at startup so scripted sequences (e.g. the
-// bury/return endings' jeep cutscenes) can reach the jeep mesh without
-// main.js having to pass it through every module individually.
+// bury ending's "Asha drives to camp" cutscene) can reach the jeep mesh
+// without main.js having to pass it through every module individually.
 export function setJeepRef(jeep) {
   jeepRef = jeep;
 }
 
 export function getJeepRef() {
   return jeepRef;
-}
-
-export function getSpeed() {
-  return speed;
 }
 
 // World-space velocity in m/s, used by animal AI (e.g. cheetah race trigger)

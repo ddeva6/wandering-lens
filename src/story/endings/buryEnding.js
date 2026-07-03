@@ -6,133 +6,126 @@
  * https://github.com/ddeva6/wandering-lens
  */
 
+import { Howl, Howler } from 'howler';
 import { eventBus } from '../../utils/eventBus.js';
-import { Howl } from 'howler';
+import { moveToward } from '../../utils/mathUtils.js';
+import { getAnimalManager } from '../../animals/AnimalManager.js';
+import { getJeepRef } from '../../jeep/jeepPhysics.js';
+import { getEndingScene, showTypewriterText, showFadeLine } from './endingUtils.js';
 
-function runEndingSequence() {
-  const overlay = document.createElement('div');
-  overlay.className = 'bury-ending-overlay';
+const VICTOR_CAMP_POSITION = { x: 80, z: 180 };
+const DRIVE_KMH = 25;
+const DRIVE_TIMEOUT_MS = 18000;
+const KNEEL_DURATION_S = 2;
+const KNEEL_DEPTH = 0.5;
+const TICK_MS = 100;
 
-  const style = document.createElement('style');
-  style.textContent = `
-    .bury-ending-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 500;
-      background: black;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-family: monospace;
-      font-size: 16px;
-      line-height: 1.6;
-      text-align: center;
-      padding: 40px;
-      opacity: 0;
-      transition: opacity 2s;
+const PHASE_A_TEXT =
+  "You put it back. Exactly where he left it. The coordinates will decay with the paper. The evidence will become the earth. Isaac will never know you found it.";
+const PHASE_B_TEXT =
+  'They come here sometimes. No one knows why. Victor wrote about it in 1979. He never found an explanation that satisfied him.';
+const FINAL_LINE = 'Some things are protected by being unknown.';
+
+function kneel(jeep, onDone) {
+  const baseY = jeep.position.y;
+  let kneelElapsed = 0;
+  const kneelInterval = setInterval(() => {
+    kneelElapsed += TICK_MS / 1000;
+    const t = Math.min(1, kneelElapsed / KNEEL_DURATION_S);
+    jeep.position.y = baseY - KNEEL_DEPTH * t;
+    if (t >= 1) {
+      clearInterval(kneelInterval);
+      onDone();
     }
-    .bury-text {
-      max-width: 600px;
-      min-height: 120px;
-    }
-  `;
-  document.head.appendChild(style);
-
-  const textContainer = document.createElement('div');
-  textContainer.className = 'bury-text';
-
-  overlay.appendChild(textContainer);
-  document.body.appendChild(overlay);
-
-  // Phase A: The act
-  // We trigger camera/jeep move in world, but since we can't easily manipulate here without refs,
-  // we emit an event that main or comebackManager could pick up, OR we simulate the passage of time here.
-  eventBus.emit('jeep:forceMove', { x: 80, y: -0.5, z: 180, duration: 2000 }); // simulated lowering
-
-  setTimeout(() => { overlay.style.opacity = '1'; }, 1000);
-
-  const text1 = "You put it back. Exactly where he left it. The coordinates will decay with the paper. The evidence will become the earth. Isaac will never know you found it.";
-
-  let i = 0;
-  function typeWriter1() {
-    if (i < text1.length) {
-      textContainer.textContent += text1.charAt(i);
-      i++;
-      setTimeout(typeWriter1, 40);
-    }
-  }
-
-  setTimeout(typeWriter1, 2000);
-
-  // Phase B: The elephant
-  setTimeout(() => {
-    textContainer.textContent = "";
-    eventBus.emit('animal:forceElephantHerd', { target: { x: 80, z: 180 }, duration: 25000 });
-
-    setTimeout(() => {
-      textContainer.style.opacity = '1';
-      textContainer.innerHTML = "They come here sometimes.<br>No one knows why. Victor wrote about it in 1979.<br>He never found an explanation that satisfied him.";
-    }, 5000);
-  }, 20000);
-
-  // Phase C: Post-credits world
-  setTimeout(() => {
-    overlay.style.opacity = '0';
-    setTimeout(() => {
-      overlay.remove();
-      style.remove();
-      setupPostCreditsWorld();
-    }, 2000);
-  }, 45000);
+  }, TICK_MS);
 }
 
-function setupPostCreditsWorld() {
-  eventBus.emit('world:removeMediaJeepsAndMarkers');
-  eventBus.emit('world:setAnimalVolume', { volume: 0.6 });
-  eventBus.emit('world:forceNightfall');
+function driveToCampThenKneel(onDone) {
+  const jeep = getJeepRef();
+  if (!jeep) {
+    onDone();
+    return;
+  }
 
-  const victorFinalEcho = new Howl({
-    src: [`${import.meta.env.BASE_URL}audio/victor/victor_08_final.mp3`],
-    volume: 0.3,
-    onloaderror: () => console.warn('[ASSET MISSING] victor_08_final.mp3')
+  let settled = false;
+  const settle = () => {
+    if (settled) return;
+    settled = true;
+    clearInterval(driveInterval);
+    clearTimeout(driveTimeout);
+    kneel(jeep, onDone);
+  };
+
+  // Distance-based arrival looks natural when the jeep is already near the
+  // camp, but the player could be anywhere on the map when this ending
+  // fires — the hard timeout guarantees the cutscene still proceeds within
+  // its Phase A budget even from the far side of the terrain.
+  const driveInterval = setInterval(() => {
+    const arrived = moveToward(jeep, VICTOR_CAMP_POSITION, DRIVE_KMH, TICK_MS / 1000, 2);
+    if (arrived) settle();
+  }, TICK_MS);
+  const driveTimeout = setTimeout(settle, DRIVE_TIMEOUT_MS);
+}
+
+function walkHerdToCamp(onDone) {
+  const animalManager = getAnimalManager();
+  const herd = animalManager?.elephantHerd;
+  if (!herd) {
+    onDone();
+    return;
+  }
+  herd.members.forEach((member, i) => {
+    const angle = (i / herd.members.length) * Math.PI * 2;
+    member.walkTo({
+      x: VICTOR_CAMP_POSITION.x + Math.cos(angle) * 12,
+      z: VICTOR_CAMP_POSITION.z + Math.sin(angle) * 12,
+    });
   });
-  victorFinalEcho.play();
+  setTimeout(onDone, 25000);
+}
 
-  setTimeout(() => {
-    const silenceText = document.createElement('div');
-    silenceText.style.position = 'fixed';
-    silenceText.style.inset = '0';
-    silenceText.style.display = 'flex';
-    silenceText.style.alignItems = 'center';
-    silenceText.style.justifyContent = 'center';
-    silenceText.style.color = 'white';
-    silenceText.style.fontFamily = 'sans-serif';
-    silenceText.style.fontSize = '18px';
-    silenceText.style.zIndex = '600';
-    silenceText.style.opacity = '0';
-    silenceText.style.transition = 'opacity 2s';
-    silenceText.textContent = "Some things are protected by being unknown.";
-    document.body.appendChild(silenceText);
+function playDistantFinalRecording() {
+  const sound = new Howl({
+    src: [`${import.meta.env.BASE_URL}audio/victor/victor_08_final.mp3`],
+    volume: 0.15,
+    onloaderror: () => console.warn('[ASSET MISSING] audio/victor/victor_08_final.mp3 (echo replay)'),
+  });
+  sound.play();
+}
 
-    setTimeout(() => {
-      silenceText.style.opacity = '1';
-    }, 1000);
+function runBuryEnding() {
+  eventBus.emit('controls:freeze');
 
-    setTimeout(() => {
-      silenceText.style.opacity = '0';
-      setTimeout(() => silenceText.remove(), 2000);
-    }, 9000);
-  }, 15000);
+  driveToCampThenKneel(() => {
+    showTypewriterText(PHASE_A_TEXT, { holdMs: 2000 });
 
-  eventBus.emit('story:endingComplete', { ending: 'bury' });
+    walkHerdToCamp(() => {
+      showTypewriterText(PHASE_B_TEXT, { holdMs: 3000 });
+
+      setTimeout(() => {
+        const scene = getEndingScene();
+        // No dedicated animal-sound bus exists to target specifically, so
+        // the overall mix is brought down as the closest available proxy
+        // for "the scene is quieter" ambient sound.
+        Howler.volume(Howler.volume() * 0.6);
+        if (scene?.background?.isColor) {
+          scene.background.set(0x0a0e1a);
+        }
+
+        playDistantFinalRecording();
+
+        setTimeout(() => {
+          showFadeLine(FINAL_LINE, { holdMs: 8000 });
+          eventBus.emit('story:endingComplete', { ending: 'bury' });
+          eventBus.emit('controls:unfreeze');
+        }, 6000);
+      }, 2000);
+    });
+  });
 }
 
 export function init() {
   eventBus.on('story:endingChosen', ({ ending }) => {
-    if (ending === 'bury') {
-      runEndingSequence();
-    }
+    if (ending === 'bury') runBuryEnding();
   });
 }

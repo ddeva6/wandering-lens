@@ -12,7 +12,6 @@
 export const victorAttempts = [
   {
     id: 1,
-    rarity: 0.1,
     year: 1978,
     zone: 'west',
     species: 'elephant',
@@ -23,7 +22,6 @@ export const victorAttempts = [
   },
   {
     id: 2,
-    rarity: 0.1,
     year: 1972,
     zone: 'west',
     species: 'elephant',
@@ -34,7 +32,6 @@ export const victorAttempts = [
   },
   {
     id: 3,
-    rarity: 0.1,
     year: 1983,
     zone: 'north',
     species: 'elephant',
@@ -45,7 +42,6 @@ export const victorAttempts = [
   },
   {
     id: 4,
-    rarity: 0.1,
     year: 1974,
     zone: 'east',
     species: 'lion',
@@ -56,7 +52,6 @@ export const victorAttempts = [
   },
   {
     id: 5,
-    rarity: 0.1,
     year: 1985,
     zone: 'east',
     species: 'lion',
@@ -67,7 +62,6 @@ export const victorAttempts = [
   },
   {
     id: 6,
-    rarity: 0.1,
     year: 1990,
     zone: 'south',
     species: 'lion',
@@ -78,7 +72,6 @@ export const victorAttempts = [
   },
   {
     id: 7,
-    rarity: 0.1,
     year: 1986,
     zone: 'south',
     species: 'cheetah',
@@ -89,7 +82,6 @@ export const victorAttempts = [
   },
   {
     id: 8,
-    rarity: 0.1,
     year: 1971,
     zone: 'east',
     species: 'cheetah',
@@ -100,7 +92,6 @@ export const victorAttempts = [
   },
   {
     id: 9,
-    rarity: 0.1,
     year: 1980,
     zone: 'west',
     species: 'giraffe',
@@ -111,7 +102,6 @@ export const victorAttempts = [
   },
   {
     id: 10,
-    rarity: 0.1,
     year: 1993,
     zone: 'north',
     species: 'giraffe',
@@ -122,7 +112,6 @@ export const victorAttempts = [
   },
   {
     id: 11,
-    rarity: 0.1,
     year: 1977,
     zone: 'north',
     species: 'zebra',
@@ -133,7 +122,6 @@ export const victorAttempts = [
   },
   {
     id: 12,
-    rarity: 0.1,
     year: 1989,
     zone: 'west',
     species: 'zebra',

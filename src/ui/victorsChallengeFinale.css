@@ -1,0 +1,77 @@
+.finale-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  background: #000000;
+  color: #ffffff;
+  font-family: sans-serif;
+  text-align: center;
+  padding: 24px;
+  opacity: 0;
+  transition: opacity 3s ease;
+}
+
+.finale-overlay--visible {
+  opacity: 1;
+}
+
+.finale-text {
+  font-size: 16px;
+  opacity: 0.85;
+  max-width: 500px;
+  margin: 0;
+}
+
+.finale-filmstrip {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 600px;
+}
+
+.finale-frame {
+  width: 34px;
+  height: 24px;
+  background: #1a1a1a;
+  border: 1px solid #444444;
+}
+
+.finale-photo {
+  width: 300px;
+  max-width: 80vw;
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 3s ease, transform 3s ease;
+}
+
+.finale-photo--developed {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.finale-photo-svg {
+  width: 100%;
+  border-radius: 4px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+}
+
+.finale-caption {
+  font-size: 14px;
+  max-width: 480px;
+  opacity: 0.8;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.finale-signature {
+  font-family: 'Caveat', cursive;
+  font-size: 20px;
+  opacity: 0.9;
+  margin: 0;
+}

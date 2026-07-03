@@ -7,103 +7,35 @@
  */
 
 import { eventBus } from '../utils/eventBus.js';
-import { load, save } from '../utils/localStorage.js';
-import { victorAttempts } from '../story/victorAttempts.js';
+import { save, load } from '../utils/localStorage.js';
 import { journalEntries } from '../story/journalEntries.js';
+import { challengeEntries } from '../story/victorsChallenge.js';
 
-let isActive = false;
-let overlay = null;
-let currentTab = 'journal'; // 'journal' or 'challenge'
+const SPECIES_COLOR = {
+  elephant: '#8a8a8a',
+  lion: '#c9a13b',
+  cheetah: '#d9863d',
+  giraffe: '#c9973d',
+  zebra: '#2a2a2a',
+};
 
-function createOverlay() {
-  overlay = document.createElement('div');
-  overlay.className = 'journal-ui-overlay';
+let panel = null;
+let activeTab = 'journal';
 
-  const tabs = document.createElement('div');
-  tabs.className = 'journal-tabs';
-
-  const journalTab = document.createElement('button');
-  journalTab.className = 'journal-tab journal-tab--active';
-  journalTab.textContent = "VICTOR'S JOURNAL";
-  journalTab.addEventListener('click', () => switchTab('journal'));
-
-  const challengeTab = document.createElement('button');
-  challengeTab.className = 'journal-tab';
-  challengeTab.textContent = "VICTOR'S CHALLENGE";
-  challengeTab.addEventListener('click', () => {
-    if (load('victors_challenge_unlocked', false)) {
-      switchTab('challenge');
-    }
-  });
-
-  tabs.appendChild(journalTab);
-  tabs.appendChild(challengeTab);
-  overlay.appendChild(tabs);
-
-  const content = document.createElement('div');
-  content.className = 'journal-content';
-  overlay.appendChild(content);
-
-  document.body.appendChild(overlay);
-}
-
-function renderChallengeContent(container) {
-  const unlocked = load('victors_challenge_unlocked', false);
-  if (!unlocked) {
-    container.innerHTML = '<div style="text-align: center; margin-top: 100px; opacity: 0.5;">Locked</div>';
-    return;
-  }
-
-  const progress = load('victors_challenge_progress', {});
-  const completedCount = Object.keys(progress).length;
-
-  let html = `<div class="challenge-progress">${completedCount} / 12</div>`;
-  html += `<div class="challenge-grid">`;
-
-  victorAttempts.forEach(entry => {
-    const isCompleted = !!progress[entry.id];
-    const data = progress[entry.id];
-
-    html += `
-      <div class="challenge-card ${isCompleted ? 'challenge-card--completed' : ''}">
-        <div class="challenge-header">
-          <span>${entry.year} — Zone: ${entry.zone.toUpperCase()}</span>
-          <div class="challenge-species-dot" title="${entry.species}"></div>
-        </div>
-        <div class="challenge-note">${entry.victorNote}</div>
-    `;
-
-    if (isCompleted) {
-      html += `
-        <div class="challenge-scores">
-          <div class="challenge-score-item">
-            <span class="challenge-score-label">VICTOR</span>
-            <span class="challenge-score-value">${data.victorScore}</span>
-          </div>
-          <div class="challenge-score-item">
-            <span class="challenge-score-label">ASHA</span>
-            <span class="challenge-score-value">${data.ashaScore}</span>
-          </div>
-        </div>
-      `;
-    } else {
-      html += `
-        <div class="challenge-incomplete">
-          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-        </div>
-      `;
-    }
-
-    html += `</div>`;
-  });
-
-  html += `</div>`;
-  container.innerHTML = html;
-}
-
-function renderJournalContent(container) {
+function handleJournalUnlock({ tier }) {
   const unlockedIds = load('journal_unlocked_ids', []);
-  container.innerHTML = journalEntries
+  const next = journalEntries.find((entry) => entry.tier === tier && !unlockedIds.includes(entry.id));
+  if (next) {
+    unlockedIds.push(next.id);
+    save('journal_unlocked_ids', unlockedIds);
+    if (panel && activeTab === 'journal') renderJournalTab();
+  }
+}
+
+function renderJournalTab() {
+  const unlockedIds = load('journal_unlocked_ids', []);
+  const list = panel.querySelector('.journal-entry-list');
+  list.innerHTML = journalEntries
     .map((entry) => {
       if (!unlockedIds.includes(entry.id)) {
         return `<div class="journal-entry journal-entry--locked">
@@ -120,61 +52,106 @@ function renderJournalContent(container) {
     .join('');
 }
 
-function handleJournalUnlock({ tier }) {
-  const unlockedIds = load('journal_unlocked_ids', []);
-  const next = journalEntries.find((entry) => entry.tier === tier && !unlockedIds.includes(entry.id));
-  if (next) {
-    unlockedIds.push(next.id);
-    save('journal_unlocked_ids', unlockedIds);
-    if (overlay && currentTab === 'journal') renderJournalContent(overlay.querySelector('.journal-content'));
-  }
+function renderChallengeTab() {
+  const progress = load('victors_challenge_progress', {});
+  const completedCount = Object.keys(progress).length;
+  const grid = panel.querySelector('.challenge-grid');
+  const counter = panel.querySelector('.challenge-progress-counter');
+  counter.textContent = `${completedCount} / ${challengeEntries.length}`;
+
+  grid.innerHTML = challengeEntries
+    .map((entry) => {
+      const done = progress[entry.id];
+      const dot = `<span class="challenge-grid-dot" style="background:${SPECIES_COLOR[entry.species]}"></span>`;
+      if (!done) {
+        return `<div class="challenge-grid-card challenge-grid-card--incomplete">
+          <p class="challenge-grid-silhouette">?</p>
+          ${dot}
+          <p class="challenge-grid-year">${entry.year}</p>
+          <p class="challenge-grid-zone">${entry.zone}</p>
+        </div>`;
+      }
+      return `<div class="challenge-grid-card challenge-grid-card--complete">
+        ${dot}
+        <p class="challenge-grid-year">${entry.year}</p>
+        <p class="challenge-grid-zone">${entry.zone}</p>
+        <p class="challenge-grid-note">${entry.victorNote}</p>
+        <div class="challenge-grid-scores">
+          <span>VICTOR ${done.victorScore}</span>
+          <span>ASHA ${done.ashaScore}</span>
+        </div>
+      </div>`;
+    })
+    .join('');
 }
 
-function switchTab(tab) {
-  currentTab = tab;
+function setTab(tab) {
+  activeTab = tab;
+  panel.querySelectorAll('.journal-tab').forEach((btn) => {
+    btn.classList.toggle('journal-tab--active', btn.dataset.tab === tab);
+  });
+  panel.querySelector('.journal-tab-panel--journal').classList.toggle('journal-tab-panel--visible', tab === 'journal');
+  panel.querySelector('.journal-tab-panel--challenge').classList.toggle('journal-tab-panel--visible', tab === 'challenge');
+  if (tab === 'journal') renderJournalTab();
+  else renderChallengeTab();
+}
 
-  const tabs = overlay.querySelectorAll('.journal-tab');
-  tabs[0].classList.toggle('journal-tab--active', tab === 'journal');
-  tabs[1].classList.toggle('journal-tab--active', tab === 'challenge');
+function buildPanel() {
+  panel = document.createElement('div');
+  panel.className = 'journal-panel';
+  const unlocked = load('victors_challenge_unlocked', false);
+  panel.innerHTML = `
+    <div class="journal-tabs">
+      <button type="button" class="journal-tab journal-tab--active" data-tab="journal">VICTOR'S JOURNAL</button>
+      <button type="button" class="journal-tab ${unlocked ? '' : 'journal-tab--greyed'}" data-tab="challenge">
+        VICTOR'S CHALLENGE
+        <span class="challenge-progress-counter"></span>
+      </button>
+    </div>
+    <div class="journal-tab-panel journal-tab-panel--journal journal-tab-panel--visible">
+      <div class="journal-entry-list"></div>
+    </div>
+    <div class="journal-tab-panel journal-tab-panel--challenge">
+      <div class="challenge-grid"></div>
+    </div>
+    <button type="button" class="journal-close">Close</button>
+  `;
+  document.body.appendChild(panel);
 
-  const content = overlay.querySelector('.journal-content');
-  if (tab === 'journal') {
-    renderJournalContent(content);
-  } else {
-    renderChallengeContent(content);
-  }
+  panel.querySelectorAll('.journal-tab').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (btn.dataset.tab === 'challenge' && !load('victors_challenge_unlocked', false)) return;
+      setTab(btn.dataset.tab);
+    });
+  });
+  panel.querySelector('.journal-close').addEventListener('click', closeJournal);
+
+  renderJournalTab();
+}
+
+function openJournal() {
+  if (!panel) buildPanel();
+  panel.classList.add('journal-panel--visible');
+  eventBus.emit('controls:freeze');
+}
+
+function closeJournal() {
+  if (!panel) return;
+  panel.classList.remove('journal-panel--visible');
+  eventBus.emit('controls:unfreeze');
 }
 
 function toggleJournal() {
-  isActive = !isActive;
-
-  if (!overlay) {
-    createOverlay();
-  }
-
-  const challengeTab = overlay.querySelectorAll('.journal-tab')[1];
-  if (!load('victors_challenge_unlocked', false)) {
-    challengeTab.classList.add('journal-tab--disabled');
-  } else {
-    challengeTab.classList.remove('journal-tab--disabled');
-  }
-
-  if (isActive) {
-    switchTab(currentTab);
-    overlay.classList.add('journal-ui-overlay--active');
-    eventBus.emit('controls:freeze');
-  } else {
-    overlay.classList.remove('journal-ui-overlay--active');
-    eventBus.emit('controls:unfreeze');
-  }
+  if (panel?.classList.contains('journal-panel--visible')) closeJournal();
+  else openJournal();
 }
 
 export function init() {
   eventBus.on('journal:unlock', handleJournalUnlock);
 
   window.addEventListener('keydown', (event) => {
-    if (event.code === 'KeyJ' && !event.repeat) {
-      toggleJournal();
-    }
+    const tag = document.activeElement?.tagName;
+    if (tag === 'TEXTAREA' || tag === 'INPUT') return;
+    if (event.key.toLowerCase() === 'j') toggleJournal();
   });
 }
