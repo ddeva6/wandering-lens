@@ -55,8 +55,6 @@ import * as buryEnding from './story/endings/buryEnding.js';
 import * as returnEnding from './story/endings/returnEnding.js';
 import * as victorsChallenge from './story/victorsChallenge.js';
 import * as journalUI from './ui/journalUI.js';
-import * as worldEndingVisuals from './story/endings/worldEndingVisuals.js';
-import * as endingWorldEffects from './story/endings/endingWorldEffects.js';
 import { init as initLoadingScreen } from './ui/loadingScreen.js';
 
 const CHASE_DISTANCE = 12;
