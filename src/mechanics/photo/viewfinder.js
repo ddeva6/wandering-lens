@@ -7,6 +7,7 @@
  */
 
 import { load } from '../../utils/localStorage.js';
+import { eventBus } from '../../utils/eventBus.js';
 import { DEFAULT_RESOURCES } from '../survival/resourceManager.js';
 import * as timingMeter from './timingMeter.js';
 import * as distanceMeter from './distanceMeter.js';
@@ -15,6 +16,7 @@ import * as momentDetector from './momentDetector.js';
 let canvas = null;
 let ctx = null;
 let active = false;
+let hasOpenedBefore = false;
 
 function resizeCanvas() {
   if (!canvas) return;
@@ -31,6 +33,11 @@ export function mount() {
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
   active = true;
+
+  if (!hasOpenedBefore) {
+    hasOpenedBefore = true;
+    eventBus.emit('photo:firstOpen');
+  }
 }
 
 export function unmount() {

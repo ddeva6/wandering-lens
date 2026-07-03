@@ -12,6 +12,7 @@ import * as viewfinder from '../mechanics/photo/viewfinder.js';
 import { setNearestDistance } from '../mechanics/photo/distanceMeter.js';
 import { resourceManager } from '../mechanics/survival/resourceManager.js';
 import { getDistanceDrivenThisFrame } from '../jeep/jeepPhysics.js';
+import { getTimeScale } from '../story/voiceSystem.js';
 
 export function createLoop(renderer, scene, camera, terrain) {
   const clock = new Clock();
@@ -21,7 +22,8 @@ export function createLoop(renderer, scene, camera, terrain) {
 
   function tick() {
     if (!running) return;
-    const delta = clock.getDelta();
+    const realDelta = clock.getDelta();
+    const delta = realDelta * getTimeScale();
     const elapsed = clock.getElapsedTime();
 
     for (const update of updatables) {
@@ -29,7 +31,7 @@ export function createLoop(renderer, scene, camera, terrain) {
     }
     animalManager.update(delta);
     setNearestDistance(animalManager.getNearestAnimalDistance());
-    resourceManager.update(delta, getDistanceDrivenThisFrame());
+    resourceManager.update(realDelta, getDistanceDrivenThisFrame());
     if (viewfinder.isActive()) viewfinder.draw();
 
     renderer.render(scene, camera);

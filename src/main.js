@@ -41,6 +41,10 @@ import { save, load } from './utils/localStorage.js';
 import * as viewfinderUI from './ui/viewfinderUI.js';
 import * as photoComparison from './mechanics/photo/photoComparison.js';
 import { init as initShotSystem } from './mechanics/photo/shotSystem.js';
+import * as voiceSystem from './story/voiceSystem.js';
+import * as radioMama from './story/radioMama.js';
+import * as campfireJournal from './mechanics/campfireJournal.js';
+import * as isaacGifts from './mechanics/isaacGifts.js';
 
 const CHASE_DISTANCE = 12;
 const CHASE_HEIGHT = 5;
@@ -95,6 +99,12 @@ function start() {
   initEngineCut();
 
   if (load('photo_album', null) === null) save('photo_album', []);
+  if (load('played_recordings', null) === null) save('played_recordings', []);
+  if (load('radio_day', null) === null) save('radio_day', 1);
+  if (load('missed_checkins', null) === null) save('missed_checkins', []);
+  if (load('player_journal', null) === null) save('player_journal', []);
+  if (load('evidence', null) === null) save('evidence', []);
+
   initShotSystem(resourceManager);
   viewfinderUI.init();
   photoComparison.init();
@@ -105,6 +115,12 @@ function start() {
   wildfire.init();
   hyenaCamp.init();
   comebackManager.init();
+  voiceSystem.init();
+  radioMama.init();
+  campfireJournal.init();
+  isaacGifts.init();
+
+  eventBus.emit('game:start');
 
   loop.add((delta) => {
     weather.update(delta);
@@ -145,7 +161,7 @@ function start() {
       eventBus,
     };
     window.eventBus = eventBus;
-    console.log('[WL] Phase 6 running — jeep, animal AI, photo mechanic, survival systems');
+    console.log('[WL] Phase 7 running — jeep, animal AI, photo mechanic, survival systems, story layer');
   }
 }
 

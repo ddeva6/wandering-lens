@@ -20,6 +20,7 @@ const KMH_TO_MS = 1 / 3.6;
 let speed = 0;
 const velocity = { x: 0, z: 0 };
 let distanceDrivenThisFrame = 0;
+let hasMovedBefore = false;
 
 export function getSpeed() {
   return speed;
@@ -59,6 +60,10 @@ export function applyDriving(delta, keys, jeep) {
   }
   speed = Math.min(MAX_SPEED, Math.max(-MAX_REVERSE_SPEED, speed));
   if (Math.abs(speed) < 0.05) speed = 0;
+  if (!hasMovedBefore && speed !== 0) {
+    hasMovedBefore = true;
+    eventBus.emit('jeep:firstMove');
+  }
 
   // Only turn while rolling; flip steering when reversing.
   const turnFactor = Math.min(Math.abs(speed) / 10, 1) * Math.sign(speed);

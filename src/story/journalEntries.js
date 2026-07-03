@@ -6,21 +6,200 @@
  * https://github.com/ddeva6/wandering-lens
  */
 
-/**
- * Journal entries placeholder.
- * Full content loaded from public/data/story.json at runtime.
- * story.json is excluded from version control — see .gitignore.
- */
-
-export const journalEntries = [];
-
-export async function loadJournalEntries() {
-  try {
-    const res = await fetch('/data/story.json');
-    const data = await res.json();
-    return data.entries || [];
-  } catch {
-    console.warn('[STORY] story.json not found — running with empty journal.');
-    return [];
-  }
-}
+// All 24 of Victor's field journal entries, 1971-1994. Emotional core of
+// the game — written in full, no placeholders. unlockCondition/tier are
+// consumed by the journal UI in a later phase; this file is the content.
+export const journalEntries = [
+  {
+    id: 1,
+    year: 1971,
+    title: 'First morning',
+    text: `I did not sleep. I told myself it was the cold, but it was not the cold. I lay in the tent listening to a sound I could not name and would not learn the name of for another two years — it was a leopard, Amara's grandmother told me eventually, and by then it had stopped frightening me. This morning I stood outside before the sun and could not lift the camera. Not because there was nothing to photograph. Because there was too much, and I did not yet know how to choose. A man from London does not arrive here and immediately deserve to point a lens at anything. I understand that now, on day one, in a way I suspect it will take years to actually learn. I wrote nothing else today. I only watched. That felt, for once, like the correct decision.`,
+    unlockCondition: { type: 'time', value: 'day1' },
+    tier: 'basic',
+  },
+  {
+    id: 2,
+    year: 1971,
+    title: 'Learning the land',
+    text: `A week in and I have learned that the savanna does not care what I know. I studied maps in London for four months. The maps did not mention that the ground changes colour by the hour, or that a dry riverbed can become a wall of water while you are still deciding whether to cross it. My guide — I will not use his name until he tells me I have earned it — laughed at me twice today. Once when I flinched at a hornbill. Once when I asked how far to the next waterhole, and he said, "however far the animals say it is," which I took for a joke and now suspect was the most precise answer I will ever receive out here. I am unlearning faster than I am learning. That seems correct, too.`,
+    unlockCondition: { type: 'time', value: 'day3' },
+    tier: 'basic',
+  },
+  {
+    id: 3,
+    year: 1972,
+    title: 'The wasted roll',
+    text: `Twenty-four frames, and I ruined every one of them chasing a cheetah I had no business chasing. I drove too close, too fast, camera rattling against my chest, and every image came back blurred or empty or aimed at grass. I am furious with myself in the specific way that only a man who thought he already knew what he was doing can be furious. The animal did not owe me a photograph. I am only beginning to understand that the wanting has to come second, always, or the picture arrives wrong even when the shutter fires correctly. I have pinned the worst frame — a smear of gold and nothing else — above my desk. A reminder. Impatience develops nothing but disappointment.`,
+    unlockCondition: { type: 'photo', value: 'basic' },
+    tier: 'basic',
+  },
+  {
+    id: 4,
+    year: 1974,
+    title: 'The herd',
+    text: `They came to the acacia line at dawn, eleven of them, a matriarch I would come to know over the following twenty years leading calves through grass taller than the calves themselves. I did not raise the camera for almost forty minutes. I have started to believe this is the actual skill — not the photographing, the waiting before it. When I finally shot, she turned her head toward the sound of the shutter and looked at me for three full seconds, not startled, simply aware, the way you might glance at a clock. I have never felt so correctly seen by something that owed me nothing. I do not know yet that I will spend two decades returning to this same family. I only know I want to.`,
+    unlockCondition: { type: 'photo', value: 'elephant' },
+    tier: 'good',
+  },
+  {
+    id: 5,
+    year: 1976,
+    title: 'The water',
+    text: `Found it today by following the zebra at dusk, exactly as I was told I would and did not quite believe. A wide brown pool ringed with tracks going back further than I can read — elephant, lion, something catlike and smaller, birds beyond counting. Everything out here, it turns out, is organised around this single unglamorous fact: water, and who needs it, and when. I sat at the edge until the light went entirely and did not take a single photograph. I wanted, for once, to just know a place before I claimed to have recorded it. I understand already that this waterhole will outlast my understanding of it. I intend to keep coming back and being wrong about it in new ways.`,
+    unlockCondition: { type: 'location', value: 'waterhole' },
+    tier: 'good',
+  },
+  {
+    id: 6,
+    year: 1978,
+    title: "The elder's correction",
+    text: `An old man from the eastern homesteads found me photographing a lioness at what I considered a respectful distance and told me, without particular unkindness, that I had misunderstood the entire exercise. "You are collecting her," he said. "You are not yet with her." I wanted to argue and could not, because he was right, and because I recognised the wanting-to-argue as further evidence of the problem. He showed me how his people read weather in the angle of a bird's flight, how a herd's stillness says more than its movement. I have photographed the savanna for seven years and have just now been told, correctly, that I have mostly been photographing myself in it. I am rewriting my notes tonight with considerably less confidence than I had this morning. Good.`,
+    unlockCondition: { type: 'location', value: 'eastZone' },
+    tier: 'good',
+  },
+  {
+    id: 7,
+    year: 1979,
+    title: 'What patience buys',
+    text: `Eight years now and I no longer bring the camera up out of reflex. I bring it up when the moment has already, in some sense, arrived without me, and the shutter is only agreeing with something already decided. Today: a giraffe bending to drink, that terrible vulnerable angle they only permit themselves for seconds at a time, legs splayed, throat exposed to anything patient enough to have been waiting. I had been waiting since first light. The frame is, I think, the best thing I have made. Not because of technique. Because I finally held still long enough to deserve it. My hands did not shake. That, more than the photograph, is the actual accomplishment of this year.`,
+    unlockCondition: { type: 'photo', value: 'good' },
+    tier: 'good',
+  },
+  {
+    id: 8,
+    year: 1981,
+    title: 'The buffalo',
+    text: `I should be dead, or at minimum considerably more injured than I am, which is to say bruised rather than gored. I misjudged a bull's mood in tall grass and it came at me with no warning I was skilled enough to read, and I did the one correct thing I have ever done purely on instinct — dropped flat, went still, let it lose interest in a target that had stopped behaving like prey. It stood over me for what my notes, written shaking two hours later, estimate at ten seconds and what my body insists was closer to an hour. I have spent a decade learning to be patient with animals. Today an animal was, arguably, patient with me. I am trying to sit with that reversal rather than simply be grateful for it.`,
+    unlockCondition: { type: 'survival', value: 'lionSurvived' },
+    tier: 'perfect',
+  },
+  {
+    id: 9,
+    year: 1983,
+    title: 'The dry year',
+    text: `The waterhole is a cracked grey scar and I have photographed three carcasses this month, which is three more than I ever wanted to photograph and, I suspect, considerably fewer than exist. There is no dignity in a drought, only arithmetic — how much water, how many mouths, how long. I keep documenting it anyway because someone should, because a silence about suffering is its own kind of lie, and because Amara's grandmother told me once that grief witnessed properly is a form of respect. I do not know if my photographs respect anything. I know that not taking them would respect even less. The rains are late. Everyone here can feel exactly how late without needing a calendar to confirm it.`,
+    unlockCondition: { type: 'location', value: 'waterhole' },
+    tier: 'perfect',
+  },
+  {
+    id: 10,
+    year: 1984,
+    title: 'The published one',
+    text: `A magazine in London printed the elephant photograph — the matriarch, 1974, the one that looked at me for three seconds — under a headline about "vanishing Africa" that I did not write and would not have written and cannot now separate from my own image no matter how I try. I should be proud. I am, mostly, something closer to uneasy. My photograph did the work I intended. Someone else's words did work I did not intend and cannot retract. I am beginning to understand that a picture, once it leaves your hands, stops belonging to you and starts belonging to whoever writes the caption. I do not yet know what to do with that understanding except sit uncomfortably inside it.`,
+    unlockCondition: { type: 'photo', value: 'perfect' },
+    tier: 'perfect',
+  },
+  {
+    id: 11,
+    year: 1985,
+    title: 'New tracks',
+    text: `Vehicle tracks across the eastern migration corridor today, deep ones, recent, cutting directly through a route the wildebeest have used since before anyone was here to name them. Not rangers — I know the ranger trucks by their tread. Something heavier. Someone is driving where no one should be driving, and driving with the particular confidence of a person who does not expect to be questioned about it. I photographed the tracks themselves, which felt absurd even as I did it — evidence of an absence, tyre marks standing in for whoever left them. I do not have a name yet for what I am starting to suspect. I have, at minimum, a bad feeling, and twenty years out here have taught me not to dismiss those.`,
+    unlockCondition: { type: 'location', value: 'eastZone' },
+    tier: 'perfect',
+  },
+  {
+    id: 12,
+    year: 1986,
+    title: 'A well-connected operator',
+    text: `A ranger I trust, speaking carefully, off the record, in the particular tone people use when they are choosing every word twice — told me that patrols along the eastern boundary have been quietly redirected for eighteen months, always just before certain nights, always somewhere else convenient. He would not say who arranges this. He used the phrase "well-connected operator" and would go no further, and the care with which he did not go further told me more than the phrase itself did. I have no name. I have a shape where a name should be — expensive, patient, careful never to be seen doing anything wrong. I intend to find the rest of it. I am aware, writing this, that intending to find it is not the same as being prepared for what finding it will cost.`,
+    unlockCondition: { type: 'survival', value: 'wildfireSurvived' },
+    tier: 'perfect',
+  },
+  {
+    id: 13,
+    year: 1987,
+    title: 'Connecting it',
+    text: `Three separate incidents I had filed as unrelated — the eastern tracks, the redirected patrols, a carcass last month missing precisely the parts that fetch a price and nothing else — are, I am now nearly certain, the same operation wearing different clothes. I have started a second notebook, hidden inside the lining of my camera case, where I keep only this. Not the animals. Not the light. The other thing. I feel a version of myself I do not entirely like taking shape around this work — colder, more procedural, less inclined to simply watch and be grateful. But I keep thinking of the elephant who looked at me for three seconds in 1974, trusting a stranger not to be the worst thing that could happen to her. I would like to still deserve that trust.`,
+    unlockCondition: { type: 'photo', value: 'perfect' },
+    tier: 'perfect',
+  },
+  {
+    id: 14,
+    year: 1988,
+    title: 'Photographing evidence',
+    text: `Different discipline entirely from photographing a lion at rest. I shot a storage structure near the eastern boundary from cover, at distance, twice at dusk when the light was worst and my presence was least likely to be noticed, and both frames are technically poor and more valuable to me than anything in twenty years of careful, patient, well-lit work. I am learning that a photograph can matter without being beautiful. I did not expect, at this age, to be starting an entirely new education. I labelled the negatives with false dates in case anyone ever finds the notebook before I am ready for them to. I do not fully trust myself with how comfortable that small deception came to me.`,
+    unlockCondition: { type: 'photo', value: 'legendary' },
+    tier: 'legendary',
+  },
+  {
+    id: 15,
+    year: 1989,
+    title: 'A name, of sorts',
+    text: `I have a letter, initial only — M — signed to a contact I will not write down even here, arranging transport for "the usual consignment" on a date that lines up exactly with a night the ranger patrol was, again, elsewhere. I do not have a face. I do not have a full name. I have a single letter and a pattern eighteen years of careful watching finally let me see whole. I sat with the notebook open for a long time tonight, unable to write anything further, aware that a letter is a very small thing to have built two decades of quiet fury around, and also aware that it is, for the first time, something. I am closer than I have ever been. I do not feel the way I expected to feel about that.`,
+    unlockCondition: { type: 'survival', value: 'hyenaSurvived' },
+    tier: 'legendary',
+  },
+  {
+    id: 16,
+    year: 1990,
+    title: 'Alone in restricted ground',
+    text: `I went further into the eastern zone than any permit allows, alone, at night, because I have run out of patience with waiting for evidence to arrive on schedule. This was not wise. I am aware, writing it the following morning by lamplight with hands that still have not fully settled, that it was not wise. But I photographed a loading operation I have no other way of proving existed, and I do not know how to weigh that against the risk honestly, because I keep arriving at the same answer — it was worth it — and I do not fully trust a man who keeps arriving at that answer about his own safety. Twenty years ago I could not lift a camera at a herd out of respect. Tonight I photographed strangers out of something closer to anger. I am not sure who that makes me.`,
+    unlockCondition: { type: 'location', value: 'eastZone' },
+    tier: 'legendary',
+  },
+  {
+    id: 17,
+    year: 1990,
+    title: "Amara's grandmother",
+    text: `The old woman found me before I found her, as she always seems to, and told me plainly that the man I am chasing has people watching the eastern boundary now, specifically, because of me. "You are not as invisible as you believe," she said, in the tone of someone stating weather rather than issuing a warning, which somehow made it land harder than shouting would have. She has buried enough to know what carelessness costs out here and told me so without softening it. I thanked her. I did not tell her I intend to keep going, because she already knew, and because saying it aloud would have made me listen to how it sounded. Some kinds of courage are only bravery from a safe distance. I am no longer certain I am at a safe distance.`,
+    unlockCondition: { type: 'location', value: 'eastZone' },
+    tier: 'legendary',
+  },
+  {
+    id: 18,
+    year: 1991,
+    title: 'The warning, ignored',
+    text: `I went back to the eastern boundary again this week, against exactly the counsel I was given by the one person out here whose counsel has never once been wrong. I told myself I was being careful. I was being careful the way a man is careful crossing a road he has already decided to cross regardless of the traffic. I have the evidence I went for. I also have the distinct sense, walking back in the dark, of being observed by something other than the animals I have spent twenty years learning to read. I did not see anyone. I am no longer sure that means no one was there. I am writing this faster than I usually write, which is itself a kind of admission.`,
+    unlockCondition: { type: 'time', value: 'day15' },
+    tier: 'legendary',
+  },
+  {
+    id: 19,
+    year: 1992,
+    title: 'The box',
+    text: `Buried the notebook, the negatives, and everything else that matters tonight, in a metal box, at a location I have recorded nowhere directly — only as a set of star positions in an entry that reads, to anyone who does not know to look for it, like an old man indulging an interest in astronomy. Southern Cross at a particular elevation, a second marker forty degrees east of it, measured from a acacia that will not move even if I am not here to point at it. I trust the sky more than I trust any hiding place a person could search. I am aware this is an odd form of trust to be placing my life's evidence in. It is, at the moment, the only form available to me.`,
+    unlockCondition: { type: 'photo', value: 'legendary' },
+    tier: 'legendary',
+  },
+  {
+    id: 20,
+    year: 1992,
+    title: 'Watched',
+    text: `A vehicle idled at the camp's edge for eleven minutes yesterday and left without anyone approaching. I counted the minutes because counting felt like the only useful thing I could do with them. I do not know if this is M's people or simply my nerves finally catching up to two decades of quiet risk. I would like to believe the second. I have started sleeping with the tent flap facing the open ground rather than the trees, which tells you plainly enough which answer I actually believe. I photographed almost nothing this week. I am aware that is itself a kind of data — the first time in twenty years the camera has felt like the least urgent thing I own.`,
+    unlockCondition: { type: 'time', value: 'day18' },
+    tier: 'legendary',
+  },
+  {
+    id: 21,
+    year: 1993,
+    title: 'The last letter home',
+    text: `Wrote to London today, to people who will read this as an old man's rambling reassurance and nothing more, because I cannot write the actual truth into a letter that other hands might open first. I told them I was well. I told them the light here is extraordinary this time of year, which is true and also entirely beside the point. I did not tell them about the vehicle, or the box, or the name that is only a single letter. I have spent my whole life believing a photograph should tell the truth plainly. I have just written an entire letter built almost completely around what it does not say. I understand the irony. I am choosing it anyway, for people I love, which feels like the only defensible reason to ever choose a comfortable lie.`,
+    unlockCondition: { type: 'time', value: 'day20' },
+    tier: 'legendary',
+  },
+  {
+    id: 22,
+    year: 1993,
+    title: 'To whoever comes after',
+    text: `A letter I do not intend to send, because I do not know who it is for yet, only that it is for someone. Whoever you are — grandchild I will very likely never meet, reading this in a year I cannot picture — I hope you have your grandmother's patience and my stubbornness. You'll need both. I hope you come here and are frightened by the silence the way I was on my first morning, and I hope it teaches you what it taught me, which is that the silence was never empty, only patient, waiting for you to stop filling it with yourself. Whatever I have found out here — the animals, the water, the other thing, the thing with a single letter for a name — I am leaving it where it can be found by someone who knows how to look. I believe, without much evidence beyond hope, that this will eventually be you.`,
+    unlockCondition: { type: 'survival', value: 'floodSurvived' },
+    tier: 'legendary',
+  },
+  {
+    id: 23,
+    year: 1994,
+    title: 'Eleven March',
+    text: `Someone is following the same routes I follow, at the same hours, closely enough that I no longer believe it is coincidence and carefully enough that I cannot prove it is not. I am not writing where I am camped tonight in words a stranger could use. I will say only this, for the one reader who would actually know how to find it: follow the herd I first photographed in 1974 to wherever they are resting this week, and go one day further past them than seems reasonable, toward the low ground the matriarch avoids in the dry season and returns to the moment the first rain breaks it. That is where I will be. I have the evidence. I have made my peace with what having it may cost. I am, for the first time in years, not afraid of the silence. I am only afraid of running out of time inside it.`,
+    unlockCondition: { type: 'survival', value: 'evidenceComplete' },
+    tier: 'legendary',
+  },
+  {
+    id: 24,
+    year: null,
+    title: 'Found in the camera',
+    text: `She was waiting. I was right. Go.`,
+    unlockCondition: { type: 'survival', value: 'allTrackersFound' },
+    tier: 'legendary',
+  },
+];
