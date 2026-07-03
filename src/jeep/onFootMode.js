@@ -15,10 +15,23 @@ export const EYE_LEVEL = 1.7;
 const WALK_SPEED_MS = WALK_SPEED_KMH / 3.6;
 
 let onFoot = false;
+let forcedWalkMode = false;
 const playerPosition = new Vector3();
 
 export function isOnFoot() {
-  return onFoot;
+  return onFoot || forcedWalkMode;
+}
+
+// Amara's field test 1 lets the player get out and track on foot without
+// fuel actually being empty — toggled by the F key, scoped to that test.
+// The caller is responsible for positioning playerPosition (via
+// getPlayerPosition()) before activating, e.g. next to the parked jeep.
+export function setForcedWalkMode(active) {
+  forcedWalkMode = active;
+}
+
+export function isForcedWalkMode() {
+  return forcedWalkMode;
 }
 
 export function getPlayerPosition() {

@@ -13,6 +13,8 @@ import { setNearestDistance } from '../mechanics/photo/distanceMeter.js';
 import { resourceManager } from '../mechanics/survival/resourceManager.js';
 import { getDistanceDrivenThisFrame } from '../jeep/jeepPhysics.js';
 import { getTimeScale } from '../story/voiceSystem.js';
+import { amara } from '../characters/amara/AmaraCharacter.js';
+import { isaac } from '../characters/isaac/IsaacCharacter.js';
 
 export function createLoop(renderer, scene, camera, terrain) {
   const clock = new Clock();
@@ -32,6 +34,8 @@ export function createLoop(renderer, scene, camera, terrain) {
     animalManager.update(delta);
     setNearestDistance(animalManager.getNearestAnimalDistance());
     resourceManager.update(realDelta, getDistanceDrivenThisFrame());
+    amara.update(delta);
+    isaac.update(delta);
     if (viewfinder.isActive()) viewfinder.draw();
 
     renderer.render(scene, camera);

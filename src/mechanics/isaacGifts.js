@@ -16,7 +16,7 @@ import { resourceManager } from './survival/resourceManager.js';
 const COLLECT_RANGE = 8;
 const EXAMINE_HOLD_MS = 3000;
 
-const DROPS = [
+export const DROPS = [
   { id: 1, position: { x: 120, z: 80 }, day: 1, items: { fuel: 20 } },
   { id: 2, position: { x: -90, z: 150 }, day: 2, items: { water: 30 } },
   { id: 3, position: { x: 200, z: -60 }, day: 3, items: { fuel: 15, battery: 20 } },
@@ -159,6 +159,14 @@ function onKeyUp(event) {
 function spawnDropsForCurrentDay() {
   const day = load('radio_day', 1);
   DROPS.filter((d) => d.day === day).forEach(spawnDrop);
+}
+
+// Called by IsaacCharacter.js's first scripted appearance to make sure
+// drop 1 is on the ground the moment he "leaves it behind", even if the
+// day/newDay check hasn't spawned it yet for some reason.
+export function spawnDropById(id) {
+  const drop = DROPS.find((d) => d.id === id);
+  if (drop) spawnDrop(drop);
 }
 
 export function init() {

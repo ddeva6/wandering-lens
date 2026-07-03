@@ -45,6 +45,9 @@ import * as voiceSystem from './story/voiceSystem.js';
 import * as radioMama from './story/radioMama.js';
 import * as campfireJournal from './mechanics/campfireJournal.js';
 import * as isaacGifts from './mechanics/isaacGifts.js';
+import { amara } from './characters/amara/AmaraCharacter.js';
+import { isaac } from './characters/isaac/IsaacCharacter.js';
+import { gpsTrackerReveal } from './mechanics/gpsTrackerReveal.js';
 
 const CHASE_DISTANCE = 12;
 const CHASE_HEIGHT = 5;
@@ -104,6 +107,10 @@ function start() {
   if (load('missed_checkins', null) === null) save('missed_checkins', []);
   if (load('player_journal', null) === null) save('player_journal', []);
   if (load('evidence', null) === null) save('evidence', []);
+  if (load('amara_trust', null) === null) save('amara_trust', 0);
+  if (load('amara_tests', null) === null) {
+    save('amara_tests', { test1: false, test2: false, test3: false });
+  }
 
   initShotSystem(resourceManager);
   viewfinderUI.init();
@@ -119,6 +126,9 @@ function start() {
   radioMama.init();
   campfireJournal.init();
   isaacGifts.init();
+  amara.init(scene, jeep.group);
+  isaac.init(scene);
+  gpsTrackerReveal.init();
 
   eventBus.emit('game:start');
 
@@ -159,9 +169,11 @@ function start() {
       isOnFoot,
       animalManager: loop.animalManager,
       eventBus,
+      amara,
+      isaac,
     };
     window.eventBus = eventBus;
-    console.log('[WL] Phase 7 running — jeep, animal AI, photo mechanic, survival systems, story layer');
+    console.log('[WL] Phase 8 running — jeep, animal AI, photo mechanic, survival systems, story layer, characters');
   }
 }
 
