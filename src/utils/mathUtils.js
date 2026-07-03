@@ -44,6 +44,14 @@ export function moveAway(mesh, source, kmh, delta) {
   mesh.rotation.y = Math.atan2(dx, dz);
 }
 
+// Same west/east/north/south quadrant split used to place every species'
+// spawn zone (see AnimalManager species spawn constants) and reused by
+// photoComparison.js / shotSystem.js for zone matching.
+export function getZone(x, z) {
+  if (Math.abs(x) >= Math.abs(z)) return x >= 0 ? 'east' : 'west';
+  return z >= 0 ? 'south' : 'north';
+}
+
 export function randomInRadius(centerX, centerZ, radius) {
   const angle = Math.random() * Math.PI * 2;
   const r = Math.random() * radius;

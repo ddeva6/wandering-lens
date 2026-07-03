@@ -8,19 +8,13 @@
 
 import { eventBus } from '../../utils/eventBus.js';
 import { victorAttempts } from '../../story/victorAttempts.js';
+import { getZone } from '../../utils/mathUtils.js';
 
 const AUTO_DISMISS_MS = 5000;
 
 let playerPosition = { x: 0, z: 0 };
 let dismissTimer = null;
 let overlay = null;
-
-// Same west/east/north/south quadrant split used to place every species'
-// spawn zone — see AnimalManager species spawn constants.
-function getZone(x, z) {
-  if (Math.abs(x) >= Math.abs(z)) return x >= 0 ? 'east' : 'west';
-  return z >= 0 ? 'south' : 'north';
-}
 
 function findMatch(species) {
   const zone = getZone(playerPosition.x, playerPosition.z);
@@ -36,7 +30,9 @@ function dismiss() {
   overlay = null;
 }
 
-function buildOverlay(attempt, shot) {
+// Exported so victorsChallenge.js can reuse the exact same side-by-side
+// panel for a Victor's Challenge match, rather than duplicating the markup.
+export function buildOverlay(attempt, shot) {
   overlay = document.createElement('div');
   overlay.className = 'photo-comparison-overlay';
 
@@ -89,5 +85,11 @@ export function init() {
     if (!shot.species) return;
     const match = findMatch(shot.species);
     if (match) buildOverlay(match, shot);
+  });
+
+  // Victor's Challenge (src/story/victorsChallenge.js) reuses this same
+  // side-by-side panel for its own entry/shot pairs.
+  eventBus.on('ui:showPhotoComparison', ({ entry, shot }) => {
+    buildOverlay(entry, shot);
   });
 }
