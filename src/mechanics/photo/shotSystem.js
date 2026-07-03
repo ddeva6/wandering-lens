@@ -12,6 +12,7 @@ import { getGameHour } from '../../world/dayNight.js';
 import { getTimingScore } from './timingMeter.js';
 import { victorAttempts } from '../../story/victorAttempts.js';
 import { getPlayerPosition } from '../../jeep/onFootMode.js';
+import { getZone } from '../../utils/mathUtils.js';
 import { getDistanceScore } from './distanceMeter.js';
 import { getMomentScore, getActiveMoment } from './momentDetector.js';
 
@@ -92,19 +93,20 @@ export function takeShot(isLegendary = false) {
   if (isLegendary) {
     eventBus.emit('photo:legendary', shot);
 
-    // Check against Victor's challenge
-    if (load('wl_victors_challenge_active', false)) {
+    // Check against Victor's challenge. shot.species is only ever set when
+    // an active photo:momentActive fired for that species (see the species
+    // classes under src/animals/species/), so a species+zone match already
+    // implies the requiredMoment happened — there's no separate moment-type
+    // field on activeMoment to compare against.
+    if (load('victors_challenge_active', false)) {
       const pos = getPlayerPosition();
-      let zone = 'centre';
-      if (pos.x < -100) zone = 'west';
-      else if (pos.x > 100) zone = 'east';
-      else if (pos.z < -100) zone = 'north';
-      else if (pos.z > 100) zone = 'south';
+      const zone = getZone(pos.x, pos.z);
+      const progress = load('victors_challenge_progress', {});
 
       const match = victorAttempts.find(entry =>
         entry.species === shot.species &&
         entry.zone === zone &&
-        entry.requiredMoment === (activeMoment ? activeMoment.type : null) &&
+        !progress[entry.id] &&
         Math.random() < (entry.rarity || 0.15)
       );
 

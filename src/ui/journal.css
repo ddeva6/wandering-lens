@@ -148,3 +148,33 @@
   font-size: 18px;
   letter-spacing: 0.1em;
 }
+
+.journal-entry {
+  max-width: 700px;
+  margin: 0 auto 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 24px;
+}
+
+.journal-entry-year {
+  font-size: 11px;
+  opacity: 0.6;
+  margin: 0 0 4px;
+}
+
+.journal-entry-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0 0 8px;
+}
+
+.journal-entry-text {
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.85;
+  margin: 0;
+}
+
+.journal-entry--locked .journal-entry-title {
+  opacity: 0.35;
+}

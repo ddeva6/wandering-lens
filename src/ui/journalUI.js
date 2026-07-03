@@ -7,8 +7,9 @@
  */
 
 import { eventBus } from '../utils/eventBus.js';
-import { load } from '../utils/localStorage.js';
+import { load, save } from '../utils/localStorage.js';
 import { victorAttempts } from '../story/victorAttempts.js';
+import { journalEntries } from '../story/journalEntries.js';
 
 let isActive = false;
 let overlay = null;
@@ -30,7 +31,7 @@ function createOverlay() {
   challengeTab.className = 'journal-tab';
   challengeTab.textContent = "VICTOR'S CHALLENGE";
   challengeTab.addEventListener('click', () => {
-    if (load('wl_victors_challenge_unlocked', false)) {
+    if (load('victors_challenge_unlocked', false)) {
       switchTab('challenge');
     }
   });
@@ -47,13 +48,13 @@ function createOverlay() {
 }
 
 function renderChallengeContent(container) {
-  const unlocked = load('wl_victors_challenge_unlocked', false);
+  const unlocked = load('victors_challenge_unlocked', false);
   if (!unlocked) {
     container.innerHTML = '<div style="text-align: center; margin-top: 100px; opacity: 0.5;">Locked</div>';
     return;
   }
 
-  const progress = load('wl_victors_challenge_progress', {});
+  const progress = load('victors_challenge_progress', {});
   const completedCount = Object.keys(progress).length;
 
   let html = `<div class="challenge-progress">${completedCount} / 12</div>`;
@@ -101,8 +102,32 @@ function renderChallengeContent(container) {
 }
 
 function renderJournalContent(container) {
-  // Placeholder for Victor's Journal content which was not required in this phase
-  container.innerHTML = '<div style="text-align: center; margin-top: 100px; opacity: 0.5;">Victor\'s Journal Entries</div>';
+  const unlockedIds = load('journal_unlocked_ids', []);
+  container.innerHTML = journalEntries
+    .map((entry) => {
+      if (!unlockedIds.includes(entry.id)) {
+        return `<div class="journal-entry journal-entry--locked">
+          <p class="journal-entry-year">${entry.year}</p>
+          <p class="journal-entry-title">???</p>
+        </div>`;
+      }
+      return `<div class="journal-entry">
+        <p class="journal-entry-year">${entry.year}</p>
+        <p class="journal-entry-title">${entry.title}</p>
+        <p class="journal-entry-text">${entry.text}</p>
+      </div>`;
+    })
+    .join('');
+}
+
+function handleJournalUnlock({ tier }) {
+  const unlockedIds = load('journal_unlocked_ids', []);
+  const next = journalEntries.find((entry) => entry.tier === tier && !unlockedIds.includes(entry.id));
+  if (next) {
+    unlockedIds.push(next.id);
+    save('journal_unlocked_ids', unlockedIds);
+    if (overlay && currentTab === 'journal') renderJournalContent(overlay.querySelector('.journal-content'));
+  }
 }
 
 function switchTab(tab) {
@@ -128,7 +153,7 @@ function toggleJournal() {
   }
 
   const challengeTab = overlay.querySelectorAll('.journal-tab')[1];
-  if (!load('wl_victors_challenge_unlocked', false)) {
+  if (!load('victors_challenge_unlocked', false)) {
     challengeTab.classList.add('journal-tab--disabled');
   } else {
     challengeTab.classList.remove('journal-tab--disabled');
@@ -145,6 +170,8 @@ function toggleJournal() {
 }
 
 export function init() {
+  eventBus.on('journal:unlock', handleJournalUnlock);
+
   window.addEventListener('keydown', (event) => {
     if (event.code === 'KeyJ' && !event.repeat) {
       toggleJournal();

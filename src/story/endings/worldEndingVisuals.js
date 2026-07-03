@@ -8,6 +8,7 @@
 
 import * as THREE from 'three';
 import { eventBus } from '../../utils/eventBus.js';
+import { amara } from '../../characters/amara/AmaraCharacter.js';
 
 let gameScene = null;
 let mediaJeeps = [];
@@ -92,33 +93,9 @@ export function init(scene) {
     // Assuming map markers are handled in their own UI system listening to ending triggers
   });
 
-  // Dummy listeners for events that don't have direct hooks into existing systems
-  // in Phase 9 without over-engineering AnimalManager/JeepPhysics changes not
-  // explicitly requested as files to edit.
-  eventBus.on('jeep:forceMove', ({ x, y, z, duration }) => {
-    // In a real implementation this would animate the jeep or camera.
-    // For now, it just acknowledges the event.
-  });
-
-  eventBus.on('animal:forceElephantHerd', ({ target, duration }) => {
-    // In a real implementation this would override Elephant AI to flock to target.
-  });
-
-  eventBus.on('world:forceNightfall', () => {
-    // In a real implementation this would modify dayNightCycle's internal time.
-  });
-
-  eventBus.on('world:setAnimalVolume', ({ volume }) => {
-    // In a real implementation this would adjust Howler group volumes for animals.
-  });
-
-  eventBus.on('jeep:driveAwayEast', () => {
-    // In a real implementation this would animate the jeep driving off.
-  });
-
   eventBus.on('world:spawnMaasaiCommunity', () => {
-    // Spawn 6 additional Maasai figures at Amara's position
-    const amaraPosition = { x: 150, z: -50 }; // Assuming Amara's act 3 position
+    // Spawn 6 additional Maasai figures at Amara's real live position.
+    const amaraPosition = { x: amara.mesh.position.x, z: amara.mesh.position.z };
 
     const geometry = new THREE.CylinderGeometry(0.3, 0.3, 1.8);
     const material = new THREE.MeshStandardMaterial({ color: 0xff0000 }); // Red shuka

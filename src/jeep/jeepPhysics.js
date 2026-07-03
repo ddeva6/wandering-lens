@@ -21,6 +21,18 @@ let speed = 0;
 const velocity = { x: 0, z: 0 };
 let distanceDrivenThisFrame = 0;
 let hasMovedBefore = false;
+let jeepRef = null;
+
+// Registered once by main.js at startup so scripted sequences (e.g. the
+// bury/return endings' jeep cutscenes) can reach the jeep mesh without
+// main.js having to pass it through every module individually.
+export function setJeepRef(jeep) {
+  jeepRef = jeep;
+}
+
+export function getJeepRef() {
+  return jeepRef;
+}
 
 export function getSpeed() {
   return speed;

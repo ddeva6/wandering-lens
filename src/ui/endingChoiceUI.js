@@ -121,7 +121,7 @@ function showOverlay() {
           card.classList.add('ending-card--selected');
 
           setTimeout(() => {
-            save('wl_ending_chosen', data.id);
+            save('ending_chosen', data.id);
             overlay.remove();
             if (canvas) {
               canvas.style.transition = '';

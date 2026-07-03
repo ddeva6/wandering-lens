@@ -14,21 +14,21 @@ let endingCheckInProgress = false;
 
 function checkConditions() {
   if (endingCheckInProgress) return;
-  if (load('wl_ending_triggered', false)) return;
+  if (load('ending_triggered', false)) return;
 
-  const evidence = load('wl_evidence', []);
+  const evidence = load('evidence', []);
   if (evidence.length < 6) return;
 
-  const recordings = load('wl_played_recordings', []);
+  const recordings = load('played_recordings', []);
   if (!recordings.includes('final_recording')) return;
 
-  const amaraTrust = load('wl_amara_trust', 0);
+  const amaraTrust = load('amara_trust', 0);
   if (amaraTrust < 3) return;
 
   if (!isaacRevealedSession) return;
 
   endingCheckInProgress = true;
-  save('wl_ending_triggered', true);
+  save('ending_triggered', true);
 
   eventBus.emit('ui:endingApproaching');
 

@@ -13,10 +13,11 @@ import { createLoop } from './core/loop.js';
 import { createTerrain } from './world/terrain.js';
 import { createSkybox } from './world/skybox.js';
 import { createDayNightCycle } from './world/dayNightCycle.js';
+import { setDayNightRef } from './world/dayNightRef.js';
 import { createWeather } from './world/weather.js';
 import { createSoundManager } from './audio/soundManager.js';
 import { createJeep } from './jeep/jeepModel.js';
-import { applyDriving, getSpeed, resetDistanceDrivenThisFrame } from './jeep/jeepPhysics.js';
+import { applyDriving, getSpeed, resetDistanceDrivenThisFrame, setJeepRef } from './jeep/jeepPhysics.js';
 import { createControls } from './jeep/controls.js';
 import { initEngineCut, getEngineState } from './jeep/engineCut.js';
 import {
@@ -37,7 +38,7 @@ import * as hyenaCamp from './mechanics/crisis/hyenaCamp.js';
 import * as comebackManager from './mechanics/comeback/comebackManager.js';
 import { setGameHour } from './world/dayNight.js';
 import { eventBus } from './utils/eventBus.js';
-import { save, load } from './utils/localStorage.js';
+import { initSaveKeys } from './utils/initSaveKeys.js';
 import * as viewfinderUI from './ui/viewfinderUI.js';
 import * as photoComparison from './mechanics/photo/photoComparison.js';
 import { init as initShotSystem } from './mechanics/photo/shotSystem.js';
@@ -56,6 +57,7 @@ import * as returnEnding from './story/endings/returnEnding.js';
 import * as victorsChallenge from './story/victorsChallenge.js';
 import * as journalUI from './ui/journalUI.js';
 import * as worldEndingVisuals from './story/endings/worldEndingVisuals.js';
+import * as endingWorldEffects from './story/endings/endingWorldEffects.js';
 
 const CHASE_DISTANCE = 12;
 const CHASE_HEIGHT = 5;
@@ -109,23 +111,9 @@ function start() {
   const dashboard = createDashboard(jeep.group);
   initEngineCut();
 
-  if (load('photo_album', null) === null) save('photo_album', []);
-  if (load('played_recordings', null) === null) save('played_recordings', []);
-  if (load('radio_day', null) === null) save('radio_day', 1);
-  if (load('missed_checkins', null) === null) save('missed_checkins', []);
-  if (load('player_journal', null) === null) save('player_journal', []);
-  if (load('evidence', null) === null) save('evidence', []);
-  if (load('amara_trust', null) === null) save('amara_trust', 0);
-  if (load('amara_tests', null) === null) {
-    save('amara_tests', { test1: false, test2: false, test3: false });
-  }
-
-  if (load('wl_ending_triggered', null) === null) save('wl_ending_triggered', false);
-  if (load('wl_ending_chosen', null) === null) save('wl_ending_chosen', null);
-  if (load('wl_victors_challenge_unlocked', null) === null) save('wl_victors_challenge_unlocked', false);
-  if (load('wl_victors_challenge_active', null) === null) save('wl_victors_challenge_active', false);
-  if (load('wl_victors_challenge_progress', null) === null) save('wl_victors_challenge_progress', {});
-  if (load('wl_victors_challenge_complete', null) === null) save('wl_victors_challenge_complete', false);
+  initSaveKeys();
+  setJeepRef(jeep.group);
+  setDayNightRef(dayNight);
 
   initShotSystem(resourceManager);
   viewfinderUI.init();
@@ -153,6 +141,7 @@ function start() {
   victorsChallenge.init();
   journalUI.init();
   worldEndingVisuals.init(scene);
+  endingWorldEffects.init();
 
   eventBus.emit('game:start');
 
@@ -197,7 +186,7 @@ function start() {
       isaac,
     };
     window.eventBus = eventBus;
-    console.log('[WL] Phase 8 running — jeep, animal AI, photo mechanic, survival systems, story layer, characters');
+    console.log('[WL] Phase 9 running — three endings, Victor\'s Challenge, journal UI');
   }
 }
 

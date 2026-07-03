@@ -66,6 +66,9 @@ export function createDayNightCycle(scene, startTimeOfDay = 6.5 / 24) {
     update,
     getTimeOfDay: () => timeOfDay,
     getHour: () => timeOfDay * 24,
+    setTimeOfDay(t) {
+      timeOfDay = t;
+    },
     dispose() {
       scene.remove(sun, hemi);
       sun.dispose();
