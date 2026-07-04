@@ -6,14 +6,14 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: var(--wl-space-5);
   background: #000000;
-  color: #ffffff;
-  font-family: sans-serif;
+  color: var(--wl-text);
+  font-family: var(--wl-font-ui);
   text-align: center;
-  padding: 24px;
+  padding: var(--wl-space-5);
   opacity: 0;
-  transition: opacity 3s ease;
+  transition: opacity 3s var(--wl-ease);
 }
 
 .finale-overlay--visible {
@@ -29,7 +29,7 @@
 
 .finale-filmstrip {
   display: flex;
-  gap: 6px;
+  gap: var(--wl-space-2);
   flex-wrap: wrap;
   justify-content: center;
   max-width: 600px;
@@ -40,6 +40,7 @@
   height: 24px;
   background: #1a1a1a;
   border: 1px solid #444444;
+  border-radius: 2px;
 }
 
 .finale-photo {
@@ -47,7 +48,7 @@
   max-width: 80vw;
   opacity: 0;
   transform: scale(0.96);
-  transition: opacity 3s ease, transform 3s ease;
+  transition: opacity 3s var(--wl-ease), transform 3s var(--wl-ease);
 }
 
 .finale-photo--developed {
@@ -57,8 +58,8 @@
 
 .finale-photo-svg {
   width: 100%;
-  border-radius: 4px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+  border-radius: var(--wl-radius-sm);
+  box-shadow: var(--wl-shadow-lg);
 }
 
 .finale-caption {
@@ -70,8 +71,8 @@
 }
 
 .finale-signature {
-  font-family: 'Caveat', cursive;
-  font-size: 20px;
+  font-family: var(--wl-font-hand);
+  font-size: 22px;
   opacity: 0.9;
   margin: 0;
 }

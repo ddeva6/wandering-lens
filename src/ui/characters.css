@@ -10,23 +10,28 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 18px;
-  background: rgba(0, 0, 0, 0.75);
-  color: #ffffff;
-  font-family: sans-serif;
+  gap: var(--wl-space-4);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: var(--wl-blur-sm);
+  -webkit-backdrop-filter: var(--wl-blur-sm);
+  color: var(--wl-text);
+  font-family: var(--wl-font-ui);
 }
 
 .birdtest-card {
   width: 220px;
   height: 160px;
-  border-radius: 8px;
-  background: #1c1c1c;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--wl-radius-lg);
+  background: var(--wl-surface);
+  backdrop-filter: var(--wl-blur);
+  -webkit-backdrop-filter: var(--wl-blur);
+  border: 1px solid var(--wl-border);
+  box-shadow: var(--wl-shadow-md);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: var(--wl-space-3);
 }
 
 .birdtest-waveform {
@@ -34,7 +39,7 @@
   height: 80px;
   border-radius: 50%;
   opacity: 0.6;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s var(--wl-ease);
 }
 
 .birdtest-waveform--playing {
@@ -55,32 +60,39 @@
   width: 260px;
   height: 6px;
   background: rgba(255, 255, 255, 0.15);
-  border-radius: 3px;
+  border-radius: var(--wl-radius-pill);
   overflow: hidden;
 }
 
 .birdtest-timer-fill {
   height: 100%;
   width: 100%;
-  background: #ffd700;
+  background: var(--wl-gold);
   transform-origin: left;
 }
 
 .birdtest-options {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: var(--wl-space-3);
   width: 320px;
 }
 
 .birdtest-option {
-  padding: 10px;
-  background: #2a2a2a;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-  color: #ffffff;
+  padding: var(--wl-space-3);
+  background: var(--wl-surface-raised);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-radius-sm);
+  color: var(--wl-text);
   font-size: 12px;
+  font-family: inherit;
   cursor: pointer;
+  transition: background var(--wl-duration-fast) var(--wl-ease), transform var(--wl-duration-fast) var(--wl-ease-spring);
+}
+
+.birdtest-option:hover:not(:disabled) {
+  background: var(--wl-surface-raised-hover);
+  transform: translateY(-2px);
 }
 
 .birdtest-option:disabled {

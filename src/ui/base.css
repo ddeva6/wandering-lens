@@ -45,7 +45,7 @@ body {
     rgba(139, 90, 43, 0) 0%,
     rgba(139, 90, 43, 0.4) 100%
   );
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s var(--wl-ease);
 }
 
 .viewfinder-canvas {
@@ -74,10 +74,12 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: var(--wl-space-5);
   background: rgba(0, 0, 0, 0.6);
-  color: #ffffff;
-  font-family: sans-serif;
+  backdrop-filter: var(--wl-blur-sm);
+  -webkit-backdrop-filter: var(--wl-blur-sm);
+  color: var(--wl-text);
+  font-family: var(--wl-font-ui);
   text-align: center;
 }
 
@@ -88,26 +90,37 @@ body {
 
 .legendary-confirm-buttons {
   display: flex;
-  gap: 16px;
+  gap: var(--wl-space-4);
 }
 
 .legendary-confirm-buttons button {
   padding: 12px 28px;
   font-size: 14px;
+  font-family: inherit;
   letter-spacing: 0.08em;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--wl-radius-pill);
   cursor: pointer;
+  box-shadow: var(--wl-shadow-sm);
+  transition: transform var(--wl-duration-fast) var(--wl-ease-spring), box-shadow var(--wl-duration-fast) var(--wl-ease);
+}
+
+.legendary-confirm-buttons button:hover {
+  box-shadow: var(--wl-shadow-md);
+}
+
+.legendary-confirm-buttons button:active {
+  transform: scale(0.96);
 }
 
 .legendary-confirm-commit {
-  background: #ffd700;
+  background: var(--wl-gold);
   color: #1a1a1a;
 }
 
 .legendary-confirm-cancel {
-  background: #4a4a4a;
-  color: #ffffff;
+  background: var(--wl-surface-raised);
+  color: var(--wl-text);
 }
 
 .photo-comparison-overlay {
@@ -117,8 +130,8 @@ body {
   display: flex;
   align-items: stretch;
   background: #0a0a0a;
-  color: #ffffff;
-  font-family: sans-serif;
+  color: var(--wl-text);
+  font-family: var(--wl-font-ui);
 }
 
 .photo-comparison-panel {

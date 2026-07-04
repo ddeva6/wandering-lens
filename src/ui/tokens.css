@@ -1,0 +1,82 @@
+/* Loaded once here — every file that reaches for Caveat/Patrick Hand
+   (loadingScreen.css, story.css, endingCutscenes.css,
+   victorsChallengeFinale.css) relies on this being the single source. */
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Patrick+Hand&display=swap');
+
+:root {
+  /* Surface + text */
+  --wl-bg: #0a0908;
+  --wl-surface: rgba(20, 17, 13, 0.84);
+  --wl-surface-solid: #161310;
+  --wl-surface-raised: rgba(255, 255, 255, 0.06);
+  --wl-surface-raised-hover: rgba(255, 255, 255, 0.1);
+  --wl-border: rgba(255, 255, 255, 0.12);
+  --wl-border-strong: rgba(255, 255, 255, 0.28);
+  --wl-text: #f5f1ea;
+  --wl-text-muted: rgba(245, 241, 234, 0.7);
+  --wl-text-faint: rgba(245, 241, 234, 0.45);
+
+  /* Accent — Victor's gold, the game's one consistent highlight colour */
+  --wl-gold: #ffd700;
+  --wl-gold-soft: rgba(255, 215, 0, 0.35);
+  --wl-danger: #ff4433;
+
+  /* Spacing scale */
+  --wl-space-1: 4px;
+  --wl-space-2: 8px;
+  --wl-space-3: 12px;
+  --wl-space-4: 16px;
+  --wl-space-5: 24px;
+  --wl-space-6: 32px;
+  --wl-space-7: 48px;
+
+  /* Radius scale */
+  --wl-radius-sm: 8px;
+  --wl-radius-md: 14px;
+  --wl-radius-lg: 20px;
+  --wl-radius-pill: 999px;
+
+  /* Elevation */
+  --wl-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --wl-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.25);
+  --wl-shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.5), 0 4px 16px rgba(0, 0, 0, 0.3);
+  --wl-glow-gold: 0 0 0 1px var(--wl-gold-soft), 0 0 32px rgba(255, 215, 0, 0.25);
+
+  /* Glass */
+  --wl-blur: blur(20px) saturate(150%);
+  --wl-blur-sm: blur(10px) saturate(140%);
+
+  /* Motion — expo-out reads as a fluid, weighted settle rather than a linear
+     fade; the soft-spring variant is used for anything that should feel
+     alive under a touch/click (card selection, button press). */
+  --wl-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --wl-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --wl-duration-fast: 0.18s;
+  --wl-duration-base: 0.32s;
+  --wl-duration-slow: 0.6s;
+
+  /* Typography */
+  --wl-font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --wl-font-serif: Georgia, 'Times New Roman', serif;
+  --wl-font-hand: 'Caveat', cursive;
+}
+
+/* Shared focus treatment: a soft gold ring rather than the browser default,
+   consistent across every interactive overlay element. Only shows for
+   keyboard focus, never mouse clicks. */
+.wl-focusable:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--wl-gold);
+  outline-offset: 2px;
+}
+
+/* Shared glass-panel base, opt-in via class so existing layout rules on
+   each overlay's root element are untouched. */
+.wl-glass {
+  background: var(--wl-surface);
+  backdrop-filter: var(--wl-blur);
+  -webkit-backdrop-filter: var(--wl-blur);
+  border: 1px solid var(--wl-border);
+}

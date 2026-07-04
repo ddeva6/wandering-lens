@@ -6,47 +6,64 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 28px;
-  background: rgba(0, 0, 0, 0.55);
-  font-family: sans-serif;
-  color: #ffffff;
+  gap: var(--wl-space-6);
+  background: rgba(10, 8, 6, 0.7);
+  backdrop-filter: var(--wl-blur-sm);
+  -webkit-backdrop-filter: var(--wl-blur-sm);
+  font-family: var(--wl-font-ui);
+  color: var(--wl-text);
 }
 
 .crisis-lion-band {
-  padding: 10px 24px;
-  border: 2px solid #ff3300;
-  border-radius: 4px;
+  padding: var(--wl-space-3) var(--wl-space-5);
+  border: 2px solid var(--wl-danger);
+  border-radius: var(--wl-radius-pill);
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.15em;
   animation: crisis-pulse 0.8s ease-in-out infinite;
 }
 
 @keyframes crisis-pulse {
-  0%, 100% { box-shadow: 0 0 6px rgba(255, 51, 0, 0.4); }
-  50% { box-shadow: 0 0 22px rgba(255, 51, 0, 0.9); }
+  0%, 100% { box-shadow: 0 0 6px rgba(255, 68, 51, 0.4); }
+  50% { box-shadow: 0 0 24px rgba(255, 68, 51, 0.9); }
 }
 
 .crisis-choice-cards {
   display: flex;
-  gap: 16px;
+  gap: var(--wl-space-4);
 }
 
 .crisis-choice-card {
-  width: 140px;
-  padding: 20px 12px;
-  background: #1a1a1a;
-  border: 1px solid #444;
-  border-radius: 6px;
-  color: #ffffff;
+  width: 150px;
+  padding: var(--wl-space-5) var(--wl-space-3);
+  background: var(--wl-surface);
+  backdrop-filter: var(--wl-blur);
+  -webkit-backdrop-filter: var(--wl-blur);
+  border: 1px solid var(--wl-border);
+  border-radius: var(--wl-radius-md);
+  box-shadow: var(--wl-shadow-md);
+  color: var(--wl-text);
   font-size: 13px;
-  letter-spacing: 0.06em;
+  font-family: inherit;
+  letter-spacing: 0.04em;
   cursor: pointer;
+  transition:
+    border-color var(--wl-duration-fast) var(--wl-ease),
+    transform var(--wl-duration-fast) var(--wl-ease),
+    box-shadow var(--wl-duration-fast) var(--wl-ease);
 }
 
-.crisis-choice-card:hover {
-  border-color: #ffffff;
+.crisis-choice-card:hover,
+.crisis-choice-card:focus-visible {
+  border-color: var(--wl-border-strong);
+  box-shadow: var(--wl-shadow-lg);
+  transform: translateY(-3px);
+}
+
+.crisis-choice-card:active {
+  transform: translateY(-1px) scale(0.98);
 }
 
 .crisis-countdown {
@@ -63,10 +80,11 @@
 
 .crisis-countdown-arc {
   fill: none;
-  stroke: #ff3300;
+  stroke: var(--wl-danger);
   stroke-width: 3;
   stroke-dasharray: 106.8;
   stroke-dashoffset: 0;
+  stroke-linecap: round;
 }
 
 .crisis-countdown-arc--depleting {
@@ -84,7 +102,7 @@
   inset: 0;
   z-index: 250;
   pointer-events: none;
-  background: rgba(255, 60, 0, 0.35);
+  background: rgba(255, 68, 51, 0.35);
   animation: crisis-warning-fade 0.4s ease-out forwards;
 }
 

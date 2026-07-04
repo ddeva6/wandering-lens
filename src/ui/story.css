@@ -1,22 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Patrick+Hand&display=swap');
-
 .victor-subtitle {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   z-index: 70;
-  padding: 14px 24px;
-  background: rgba(0, 0, 0, 0.6);
-  color: #ffffff;
-  font-family: sans-serif;
+  padding: var(--wl-space-4) var(--wl-space-5);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0));
+  color: var(--wl-text);
+  font-family: var(--wl-font-ui);
   font-size: 13px;
   line-height: 1.6;
   text-align: center;
   max-height: 2.4em;
   overflow: hidden;
   opacity: 0;
-  transition: opacity 0.5s ease;
+  transition: opacity var(--wl-duration-base) var(--wl-ease);
 }
 
 .victor-subtitle--visible {
@@ -24,7 +22,7 @@
 }
 
 .victor-final-slowmo #game-canvas {
-  transition: filter 0.3s ease;
+  transition: filter 0.3s var(--wl-ease);
 }
 
 .radio-mama-subtitle {
@@ -38,41 +36,50 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: var(--wl-blur-sm);
+  -webkit-backdrop-filter: var(--wl-blur-sm);
 }
 
 .campfire-journal-paper {
   width: min(480px, 88vw);
-  padding: 28px;
+  padding: var(--wl-space-6);
   background: #f5e6c8;
-  border-radius: 4px;
+  border-radius: var(--wl-radius-md);
   filter: contrast(1.05) sepia(0.05);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--wl-shadow-lg);
   color: #2a2016;
 }
 
 .campfire-journal-title {
-  margin: 0 0 14px;
-  font-family: 'Caveat', cursive;
-  font-size: 26px;
+  margin: 0 0 var(--wl-space-4);
+  font-family: var(--wl-font-hand);
+  font-size: 28px;
 }
 
 .campfire-journal-textarea {
   width: 100%;
   min-height: 6em;
   box-sizing: border-box;
-  padding: 10px;
-  border: none;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.35);
+  padding: var(--wl-space-3);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--wl-radius-sm);
+  background: rgba(255, 255, 255, 0.4);
   font-family: 'Patrick Hand', cursive;
-  font-size: 14px;
+  font-size: 15px;
   color: #2a2016;
   resize: vertical;
+  transition: background var(--wl-duration-fast) var(--wl-ease);
+}
+
+.campfire-journal-textarea:focus-visible {
+  background: rgba(255, 255, 255, 0.6);
+  outline: 2px solid #6b4a2a;
+  outline-offset: 1px;
 }
 
 .campfire-journal-counter {
-  margin: 6px 0 0;
+  margin: var(--wl-space-2) 0 0;
   font-size: 11px;
   text-align: right;
   opacity: 0.7;
@@ -81,20 +88,30 @@
 .campfire-journal-buttons {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 14px;
+  gap: var(--wl-space-3);
+  margin-top: var(--wl-space-4);
 }
 
 .campfire-journal-buttons button {
-  padding: 8px 18px;
+  padding: 9px 20px;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--wl-radius-pill);
   font-size: 13px;
+  font-family: inherit;
   cursor: pointer;
+  transition: transform var(--wl-duration-fast) var(--wl-ease-spring), filter var(--wl-duration-fast) var(--wl-ease);
+}
+
+.campfire-journal-buttons button:hover {
+  filter: brightness(1.08);
+}
+
+.campfire-journal-buttons button:active {
+  transform: scale(0.96);
 }
 
 .campfire-journal-close {
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.12);
   color: #2a2016;
 }
 
@@ -109,17 +126,17 @@
   z-index: 165;
   display: flex;
   background: #0a0a0a;
-  color: #ffffff;
-  font-family: sans-serif;
+  color: var(--wl-text);
+  font-family: var(--wl-font-ui);
 }
 
 .journal-readback-panel {
   width: 50%;
-  padding: 32px;
+  padding: var(--wl-space-6);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--wl-space-3);
 }
 
 .journal-readback-label {
@@ -137,15 +154,25 @@
 
 .journal-readback-close {
   position: fixed;
-  bottom: 32px;
+  bottom: var(--wl-space-6);
   left: 50%;
   transform: translateX(-50%);
-  padding: 10px 24px;
-  background: #ffd700;
+  padding: 11px 28px;
+  background: var(--wl-gold);
   color: #1a1a1a;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--wl-radius-pill);
   font-size: 13px;
+  font-family: inherit;
   cursor: pointer;
+  box-shadow: var(--wl-shadow-sm);
+  transition: transform var(--wl-duration-fast) var(--wl-ease-spring), box-shadow var(--wl-duration-fast) var(--wl-ease);
 }
 
+.journal-readback-close:hover {
+  box-shadow: var(--wl-shadow-md);
+}
+
+.journal-readback-close:active {
+  transform: translateX(-50%) scale(0.96);
+}
