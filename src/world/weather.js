@@ -46,8 +46,12 @@ export function createWeather(scene) {
   let state = WEATHER_STATES.CLEAR;
   let timer = nextDuration();
   const modifiers = { lightFactor: 1, skyTint: 1 };
+  // Tracked independently of scene.fog.far so zoneManager.js can blend its
+  // own contribution into scene.fog.far without corrupting the value this
+  // easing converges toward next frame.
+  let currentFogFar = SETTINGS[state].fogFar;
 
-  scene.fog = new Fog(0x87ceeb, 50, SETTINGS[state].fogFar);
+  scene.fog = new Fog(0x87ceeb, 50, currentFogFar);
 
   let playerPosition = { x: 0, z: 0 };
   let lastFogPos = { x: -Infinity, z: -Infinity };
@@ -87,7 +91,8 @@ export function createWeather(scene) {
         }
       }
       if (shouldUpdateFog) {
-        scene.fog.far += (target.fogFar - scene.fog.far) * k;
+        currentFogFar += (target.fogFar - currentFogFar) * k;
+        scene.fog.far = currentFogFar;
       }
     }
   }
@@ -96,6 +101,7 @@ export function createWeather(scene) {
     update,
     getState: () => state,
     getModifiers: () => modifiers,
+    getFogFar: () => currentFogFar,
     dispose() {
       scene.fog = null;
     },

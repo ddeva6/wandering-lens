@@ -108,7 +108,7 @@ let hasSeenDawn = false;
 
 export function init() {
   Object.values(copy.victorRecordings).forEach((recording) => {
-    const trigger = recording.trigger === 'game:start' ? 'game:loaded' : recording.trigger;
+    const trigger = recording.trigger === 'game:start' ? 'game:profileReady' : recording.trigger;
     eventBus.on(trigger, () => playRecording(recording));
   });
 

@@ -11,6 +11,7 @@ import { CylinderGeometry, MeshStandardMaterial, Mesh, PointLight, BoxGeometry }
 import { eventBus } from '../../utils/eventBus.js';
 import { moveToward, randomInRadius, lerp } from '../../utils/mathUtils.js';
 import { amara } from '../../characters/amara/AmaraCharacter.js';
+import { asha } from '../../characters/asha/AshaCharacter.js';
 import { getJeepRef } from '../../jeep/jeepPhysics.js';
 import { holdCameraOn } from '../../core/camera.js';
 import { getEndingScene, showFadeLine, showTypewriterText } from './endingUtils.js';
@@ -34,12 +35,18 @@ function moveJournalToAmara(fromPos, onDone) {
   book.position.set(fromPos.x, 1, fromPos.z);
   getEndingScene()?.add(book);
 
+  asha.setPosition(fromPos.x, 0, fromPos.z);
+  asha.setVisible(true);
+
   let elapsed = 0;
   const interval = setInterval(() => {
     elapsed += TICK_MS / 1000;
     const t = Math.min(1, elapsed / JOURNAL_MOVE_S);
-    book.position.x = lerp(fromPos.x, amara.mesh.position.x, t);
-    book.position.z = lerp(fromPos.z, amara.mesh.position.z, t);
+    const x = lerp(fromPos.x, amara.mesh.position.x, t);
+    const z = lerp(fromPos.z, amara.mesh.position.z, t);
+    book.position.x = x;
+    book.position.z = z;
+    asha.setPosition(x, 0, z);
     if (t >= 1) {
       clearInterval(interval);
       onDone();
@@ -83,6 +90,7 @@ function driveAwayEast(onDone) {
     onDone();
     return;
   }
+  asha.setVisible(false); // back in the jeep for the drive home
   holdCameraOn(
     { x: groupPos.x, y: 15, z: groupPos.z + 40 },
     { x: groupPos.x, y: 0, z: groupPos.z },

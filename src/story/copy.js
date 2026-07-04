@@ -103,4 +103,46 @@ export const copy = {
       '"The savanna doesn\'t reward the lucky. It rewards the ones who stayed." — Victor Osei Mensah, 1987',
     radioMamaMissed: "Missed Radio Mama's check-in last night.",
   },
+
+  zoneNames: {
+    camp: 'Camp',
+    waterhole: 'The Waterhole',
+    eastern: 'Eastern Territory',
+    plateau: 'The Plateau',
+    burnt: 'The Burnt Lands',
+  },
+
+  customization: {
+    title: 'Before the journey',
+    nameLabel: 'Name',
+    skinToneLabel: 'Skin tone',
+    hairLabel: 'Hair',
+    pronounsLabel: 'Pronouns',
+    beginButton: 'Begin',
+  },
+
+  journal: {
+    title: "{name}'s Journal — Day {day}",
+    textareaLabel: "Write in {name}'s journal",
+  },
 };
+
+const PRONOUN_SETS = {
+  she: { subject: 'she', object: 'her', possessive: 'her' },
+  he: { subject: 'he', object: 'him', possessive: 'his' },
+  they: { subject: 'they', object: 'them', possessive: 'their' },
+};
+
+// Substitutes {name}/{subject}/{object}/{possessive} tokens using the
+// player's saved wl_asha_profile. Any copy that needs to reference the
+// player by name or pronoun should route through this instead of
+// hardcoding "Asha"/"she"/"her" directly.
+export function t(str, profile) {
+  const name = profile?.name || 'Asha';
+  const pronouns = PRONOUN_SETS[profile?.pronouns] || PRONOUN_SETS.she;
+  return str
+    .replace(/\{name\}/g, name)
+    .replace(/\{subject\}/g, pronouns.subject)
+    .replace(/\{object\}/g, pronouns.object)
+    .replace(/\{possessive\}/g, pronouns.possessive);
+}

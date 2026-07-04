@@ -1,0 +1,20 @@
+.zone-subtitle {
+  position: fixed;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 65;
+  font-family: var(--wl-font-ui);
+  font-size: 13px;
+  font-variant: small-caps;
+  letter-spacing: 0.2em;
+  color: var(--wl-text);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
+  opacity: 0;
+  transition: opacity 1s var(--wl-ease);
+  pointer-events: none;
+}
+
+.zone-subtitle--visible {
+  opacity: 1;
+}

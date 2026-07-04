@@ -8,7 +8,7 @@
 
 import { createRenderer } from './core/renderer.js';
 import { createScene } from './core/scene.js';
-import { createCamera, applyCameraEffects, getCinematicOverride, prefersReducedMotion } from './core/camera.js';
+import { createCamera, updateChaseCamera, prefersReducedMotion } from './core/camera.js';
 import { createLoop } from './core/loop.js';
 import { createTerrain } from './world/terrain.js';
 import { createSkybox } from './world/skybox.js';
@@ -24,7 +24,6 @@ import {
   updateOnFootMode,
   updateWalk,
   getPlayerPosition,
-  EYE_LEVEL,
 } from './jeep/onFootMode.js';
 import { createDashboard } from './jeep/dashboard.js';
 import { resourceManager } from './mechanics/survival/resourceManager.js';
@@ -56,39 +55,11 @@ import * as returnEnding from './story/endings/returnEnding.js';
 import * as victorsChallenge from './story/victorsChallenge.js';
 import * as journalUI from './ui/journalUI.js';
 import { init as initLoadingScreen } from './ui/loadingScreen.js';
-
-const CHASE_DISTANCE = 12;
-const CHASE_HEIGHT = 5;
-
-function updateChaseCamera(camera, jeep, look) {
-  const cinematic = getCinematicOverride();
-  if (cinematic) {
-    camera.position.set(cinematic.position.x, cinematic.position.y, cinematic.position.z);
-    camera.lookAt(cinematic.lookAt.x, cinematic.lookAt.y, cinematic.lookAt.z);
-    return;
-  }
-  if (isOnFoot()) {
-    const player = getPlayerPosition();
-    const eyeY = player.y + EYE_LEVEL;
-    camera.position.set(player.x, eyeY, player.z);
-    camera.lookAt(
-      player.x - Math.sin(look.yaw) * Math.cos(look.pitch),
-      eyeY - Math.sin(look.pitch),
-      player.z - Math.cos(look.yaw) * Math.cos(look.pitch)
-    );
-    applyCameraEffects(camera);
-    return;
-  }
-  const yaw = jeep.rotation.y + look.yaw;
-  const target = jeep.position;
-  camera.position.set(
-    target.x + Math.sin(yaw) * CHASE_DISTANCE,
-    target.y + CHASE_HEIGHT + look.pitch * 8,
-    target.z + Math.cos(yaw) * CHASE_DISTANCE
-  );
-  camera.lookAt(target.x, target.y + 1.5, target.z);
-  applyCameraEffects(camera);
-}
+import * as zoneManager from './world/zoneManager.js';
+import { scatterGroundCover } from './world/groundCover.js';
+import * as zoneSubtitle from './ui/zoneSubtitle.js';
+import * as customizationScreen from './ui/customizationScreen.js';
+import { asha } from './characters/asha/AshaCharacter.js';
 
 function start() {
   initLoadingScreen();
@@ -105,6 +76,10 @@ function start() {
   const weather = createWeather(scene);
   const dayNight = createDayNightCycle(scene);
   createSoundManager();
+
+  zoneManager.init(scene, dayNight.hemiLight);
+  scatterGroundCover(scene, terrain);
+  asha.init(scene);
 
   const loop = createLoop(renderer, scene, camera, terrain);
   resourceManager.init();
@@ -140,6 +115,8 @@ function start() {
   returnEnding.init();
   victorsChallenge.init();
   journalUI.init();
+  zoneSubtitle.init();
+  customizationScreen.init();
 
   eventBus.emit('game:start');
 
@@ -148,17 +125,22 @@ function start() {
     dayNight.update(delta, weather.getModifiers());
     setGameHour(dayNight.getHour());
 
+    let currentPosition;
     if (isOnFoot()) {
       resetDistanceDrivenThisFrame();
       updateWalk(delta, controls.keys, controls.getLook().yaw);
       const player = getPlayerPosition();
       player.y = terrain.getHeightAt(player.x, player.z);
       eventBus.emit('jeep:positionUpdate', { position: player });
+      currentPosition = player;
+      asha.setPosition(player.x, player.y, player.z);
     } else {
       applyDriving(delta, controls.keys, jeep.group);
       const ground = terrain.getHeightAt(jeep.group.position.x, jeep.group.position.z);
       jeep.group.position.y = ground + 1;
+      currentPosition = jeep.group.position;
     }
+    zoneManager.update(currentPosition, weather.getFogFar());
     updateOnFootMode(resourceManager.get(), jeep.group);
     dashboard.update(delta);
     updateChaseCamera(camera, jeep.group, controls.getLook());
@@ -177,9 +159,12 @@ function start() {
       eventBus,
       amara,
       isaac,
+      asha,
+      scene,
+      dayNight,
     };
     window.eventBus = eventBus;
-    console.log('[WL] Phase 10 running — Polish and Production Deploy');
+    console.log('[WL] Phase 12 running — zone identity system, Asha customization');
   }
 }
 
