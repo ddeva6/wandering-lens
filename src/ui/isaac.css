@@ -4,14 +4,16 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 40;
-  padding: 8px 18px;
+  padding: var(--wl-space-2) var(--wl-space-4);
   background: rgba(0, 0, 0, 0.55);
-  color: #ffffff;
-  font-family: sans-serif;
+  backdrop-filter: var(--wl-blur-sm);
+  -webkit-backdrop-filter: var(--wl-blur-sm);
+  color: var(--wl-text);
+  font-family: var(--wl-font-ui);
   font-size: 13px;
-  border-radius: 4px;
+  border-radius: var(--wl-radius-pill);
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity var(--wl-duration-fast) var(--wl-ease);
   pointer-events: none;
 }
 
@@ -31,10 +33,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  background: rgba(0, 0, 0, 0.75);
-  color: #ffffff;
-  font-family: sans-serif;
+  gap: var(--wl-space-4);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: var(--wl-blur-sm);
+  -webkit-backdrop-filter: var(--wl-blur-sm);
+  color: var(--wl-text);
+  font-family: var(--wl-font-ui);
 }
 
 .isaac-tracker-disc {

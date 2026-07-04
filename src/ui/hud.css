@@ -4,15 +4,17 @@
   left: 0;
   right: 0;
   z-index: 60;
-  padding: 10px 16px;
-  background: rgba(0, 0, 0, 0.4);
-  color: #ffffff;
-  font-family: sans-serif;
+  padding: var(--wl-space-3) var(--wl-space-4);
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: var(--wl-blur-sm);
+  -webkit-backdrop-filter: var(--wl-blur-sm);
+  color: var(--wl-text);
+  font-family: var(--wl-font-ui);
   text-align: center;
 }
 
 .flood-urgency-text {
-  margin: 0 0 6px;
+  margin: 0 0 var(--wl-space-2);
   font-size: 12px;
   letter-spacing: 0.15em;
 }
@@ -20,16 +22,17 @@
 .flood-urgency-track {
   height: 6px;
   background: rgba(255, 255, 255, 0.15);
-  border-radius: 3px;
+  border-radius: var(--wl-radius-pill);
   overflow: hidden;
 }
 
 .flood-urgency-fill {
   height: 100%;
   width: 100%;
-  background: #ff3300;
+  background: var(--wl-danger);
   transform-origin: left;
   transform: scaleX(1);
+  transition: transform 0.3s linear;
 }
 
 .flood-subtitle,
@@ -41,8 +44,8 @@
   z-index: 60;
   max-width: 70vw;
   text-align: center;
-  color: #ffffff;
-  font-family: sans-serif;
+  color: var(--wl-text);
+  font-family: var(--wl-font-ui);
   font-size: 15px;
   font-style: italic;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
@@ -53,7 +56,7 @@
   inset: 0;
   z-index: 150;
   background: rgba(10, 6, 2, 0.35);
-  transition: opacity 1.2s ease;
+  transition: opacity 1.2s var(--wl-ease);
 }
 
 .campfire-overlay--dying {
@@ -96,8 +99,8 @@
   top: calc(50% + 60px);
   left: 50%;
   transform: translateX(-50%);
-  color: #ffffff;
-  font-family: sans-serif;
+  color: var(--wl-text);
+  font-family: var(--wl-font-ui);
   font-size: 13px;
   letter-spacing: 0.08em;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
@@ -109,19 +112,20 @@
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 8px;
+  gap: var(--wl-space-2);
 }
 
 .campfire-miss {
   width: 12px;
   height: 12px;
   border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 2px;
+  border-radius: 3px;
+  transition: background var(--wl-duration-fast) var(--wl-ease), border-color var(--wl-duration-fast) var(--wl-ease);
 }
 
 .campfire-miss--active {
-  background: #ff3300;
-  border-color: #ff3300;
+  background: var(--wl-danger);
+  border-color: var(--wl-danger);
 }
 
 .campfire-target {
@@ -131,7 +135,8 @@
   transform: translate(-50%, -50%);
   border-radius: 50%;
   background: radial-gradient(circle, #ffb347 0%, #7a3d0a 100%);
-  border: 2px solid #ffd700;
+  border: 2px solid var(--wl-gold);
+  box-shadow: var(--wl-shadow-sm);
   cursor: pointer;
   animation: campfire-target-fade 3s linear forwards;
 }

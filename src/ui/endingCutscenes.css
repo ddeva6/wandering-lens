@@ -6,12 +6,12 @@
   z-index: 60;
   max-width: 65vw;
   text-align: center;
-  color: #ffffff;
-  font-family: sans-serif;
+  color: var(--wl-text);
+  font-family: var(--wl-font-ui);
   font-size: 15px;
   line-height: 1.6;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
-  transition: opacity 1s ease;
+  transition: opacity var(--wl-duration-slow) var(--wl-ease);
 }
 
 .ending-typewriter--fading {
@@ -29,12 +29,12 @@
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 60;
-  color: #ffffff;
-  font-family: sans-serif;
-  font-size: 18px;
+  color: var(--wl-text);
+  font-family: var(--wl-font-ui);
+  font-size: 19px;
   text-align: center;
   opacity: 0;
-  transition: opacity 1.5s ease;
+  transition: opacity 1.5s var(--wl-ease);
 }
 
 .ending-fade-line--visible {
@@ -52,7 +52,7 @@
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity 1s ease;
+  transition: opacity 1s var(--wl-ease);
 }
 
 .ending-still--visible {
@@ -61,15 +61,15 @@
 
 .ending-signature {
   position: fixed;
-  bottom: 24px;
+  bottom: var(--wl-space-5);
   left: 50%;
   transform: translateX(-50%);
   z-index: 60;
   text-align: center;
-  font-family: 'Caveat', cursive;
-  color: #ffffff;
+  font-family: var(--wl-font-hand);
+  color: var(--wl-text);
   opacity: 0;
-  transition: opacity 2s ease;
+  transition: opacity 2s var(--wl-ease);
 }
 
 .ending-signature--visible {
