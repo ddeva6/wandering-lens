@@ -62,6 +62,13 @@ export function lerp(a, b, t) {
   return a + (b - a) * Math.min(1, Math.max(0, t));
 }
 
+// Classic GLSL-style smoothstep — 0 below edge0, 1 above edge1, eased
+// in between. Used by zoneManager.js for the feathered zone-boundary falloff.
+export function smoothstep(edge0, edge1, x) {
+  const t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
+  return t * t * (3 - 2 * t);
+}
+
 // Interpolates between two '#rrggbb' hex colours, returned as 'rgb(r, g, b)'.
 export function lerpColor(hexA, hexB, t) {
   const a = parseInt(hexA.slice(1), 16);

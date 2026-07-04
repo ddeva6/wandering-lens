@@ -8,6 +8,10 @@
 
 import { PerspectiveCamera, Frustum, Matrix4 } from 'three';
 import { eventBus } from '../utils/eventBus.js';
+import { isOnFoot, getPlayerPosition, EYE_LEVEL } from '../jeep/onFootMode.js';
+
+const CHASE_DISTANCE = 12;
+const CHASE_HEIGHT = 5;
 
 export const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -113,4 +117,36 @@ export function updateFrustum(cameraInstance) {
     cameraInstance.matrixWorldInverse
   );
   frustum.setFromProjectionMatrix(frustumMatrix);
+}
+
+// Third-person chase cam while driving, first-person eyes while on foot,
+// or a full hijack while a cinematic override is active.
+export function updateChaseCamera(cameraInstance, jeep, look) {
+  const cinematic = getCinematicOverride();
+  if (cinematic) {
+    cameraInstance.position.set(cinematic.position.x, cinematic.position.y, cinematic.position.z);
+    cameraInstance.lookAt(cinematic.lookAt.x, cinematic.lookAt.y, cinematic.lookAt.z);
+    return;
+  }
+  if (isOnFoot()) {
+    const player = getPlayerPosition();
+    const eyeY = player.y + EYE_LEVEL;
+    cameraInstance.position.set(player.x, eyeY, player.z);
+    cameraInstance.lookAt(
+      player.x - Math.sin(look.yaw) * Math.cos(look.pitch),
+      eyeY - Math.sin(look.pitch),
+      player.z - Math.cos(look.yaw) * Math.cos(look.pitch)
+    );
+    applyCameraEffects(cameraInstance);
+    return;
+  }
+  const yaw = jeep.rotation.y + look.yaw;
+  const target = jeep.position;
+  cameraInstance.position.set(
+    target.x + Math.sin(yaw) * CHASE_DISTANCE,
+    target.y + CHASE_HEIGHT + look.pitch * 8,
+    target.z + Math.cos(yaw) * CHASE_DISTANCE
+  );
+  cameraInstance.lookAt(target.x, target.y + 1.5, target.z);
+  applyCameraEffects(cameraInstance);
 }

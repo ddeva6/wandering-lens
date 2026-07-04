@@ -10,6 +10,7 @@ import { eventBus } from '../utils/eventBus.js';
 import { save, load } from '../utils/localStorage.js';
 import { getGameHour } from '../world/dayNight.js';
 import { distance2D } from '../utils/mathUtils.js';
+import { copy, t } from '../story/copy.js';
 
 const CAMP_POSITION = { x: 0, z: 0 };
 const CAMP_RADIUS = 30;
@@ -113,12 +114,15 @@ function showReadback(onDone) {
 
 function showJournalInput() {
   const day = load('radio_day', 1);
+  const profile = load('asha_profile', null);
+  const title = t(copy.journal.title, profile).replace('{day}', day);
+  const textareaLabel = t(copy.journal.textareaLabel, profile);
   const overlay = document.createElement('div');
   overlay.className = 'campfire-journal-overlay';
   overlay.innerHTML = `
     <div class="campfire-journal-paper">
-      <p class="campfire-journal-title">Asha's Journal — Day ${day}</p>
-      <textarea class="campfire-journal-textarea" maxlength="${CHAR_LIMIT}" placeholder="What happened today..." aria-label="Write in Asha's journal"></textarea>
+      <p class="campfire-journal-title">${title}</p>
+      <textarea class="campfire-journal-textarea" maxlength="${CHAR_LIMIT}" placeholder="What happened today..." aria-label="${textareaLabel}"></textarea>
       <p class="campfire-journal-counter">0 / ${CHAR_LIMIT}</p>
       <div class="campfire-journal-buttons">
         <button type="button" class="campfire-journal-close" aria-label="Close without saving">Close</button>

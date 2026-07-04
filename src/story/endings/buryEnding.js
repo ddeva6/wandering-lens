@@ -11,6 +11,7 @@ import { eventBus } from '../../utils/eventBus.js';
 import { moveToward } from '../../utils/mathUtils.js';
 import { getAnimalManager } from '../../animals/AnimalManager.js';
 import { getJeepRef } from '../../jeep/jeepPhysics.js';
+import { asha } from '../../characters/asha/AshaCharacter.js';
 import { getEndingScene, showTypewriterText, showFadeLine } from './endingUtils.js';
 
 const VICTOR_CAMP_POSITION = { x: 80, z: 180 };
@@ -27,12 +28,14 @@ const PHASE_B_TEXT =
 const FINAL_LINE = 'Some things are protected by being unknown.';
 
 function kneel(jeep, onDone) {
+  asha.setPosition(jeep.position.x + 1.5, jeep.position.y, jeep.position.z);
+  asha.setVisible(true);
   const baseY = jeep.position.y;
   let kneelElapsed = 0;
   const kneelInterval = setInterval(() => {
     kneelElapsed += TICK_MS / 1000;
     const t = Math.min(1, kneelElapsed / KNEEL_DURATION_S);
-    jeep.position.y = baseY - KNEEL_DEPTH * t;
+    if (asha.mesh) asha.mesh.position.y = baseY - KNEEL_DEPTH * t;
     if (t >= 1) {
       clearInterval(kneelInterval);
       onDone();

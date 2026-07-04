@@ -85,6 +85,10 @@ export function createDayNightCycle(scene, startTimeOfDay = 6.5 / 24) {
     update,
     getTimeOfDay: () => timeOfDay,
     getHour: () => timeOfDay * 24,
+    // Exposed so zoneManager.js can multiply a zone ambient tint into the
+    // hemisphere light's colour without this module needing to know
+    // anything about zones itself.
+    hemiLight: hemi,
     dispose() {
       scene.remove(sun, hemi);
       sun.dispose();
